@@ -39,7 +39,11 @@ build/Release
 
 # Dependency directories
 node_modules/
+package-lock.json
 jspm_packages/
+yarn.lock
+.pnpm-lock.yaml
+.yarn-integrity
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
@@ -146,3 +150,9 @@ vite.config.ts.timestamp-*
 *.njsproj
 *.sln
 *.sw?
+
+# Mac system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
