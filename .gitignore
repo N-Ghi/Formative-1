@@ -39,6 +39,7 @@ build/Release
 
 # Dependency directories
 node_modules/
+package-lock.json
 jspm_packages/
 yarn.lock
 .pnpm-lock.yaml
@@ -155,5 +156,3 @@ vite.config.ts.timestamp-*
 .AppleDouble
 .LSOverride
 
-# Backend files
-/backend/package-lock.jsonbackend/package-lock.json
