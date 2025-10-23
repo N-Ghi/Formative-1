@@ -1,12 +1,45 @@
 import { Inventory } from '../models/inventoryModel.js';
 import { Product } from '../models/productModel.js';
+import { Op } from 'sequelize';
 
 /**
- * Get all inventory records with product details fro the authenticated user's products
+ * Get all inventories (with pagination and optional filtering)
+ *
+ * Supports:
+ *  - limit / offset for pagination
+ *  - quantityMin / quantityMax filtering
+ *  - restockMin / restockMax filtering
+ *  - scoped to the authenticated seller
  */
 export const getAllInventories = async (req, res) => {
     try {
-        const inventories = await Inventory.findAll({
+        const {
+            limit = 10,
+            offset = 0,
+            quantityMin,
+            quantityMax,
+            restockMin,
+            restockMax,
+        } = req.query;
+
+        // Build dynamic where clause for Inventory filters
+        const whereClause = {};
+
+        if (quantityMin || quantityMax) {
+            whereClause.quantity = {};
+            if (quantityMin) whereClause.quantity[Op.gte] = Number(quantityMin);
+            if (quantityMax) whereClause.quantity[Op.lte] = Number(quantityMax);
+        }
+
+        if (restockMin || restockMax) {
+            whereClause.restockValue = {};
+            if (restockMin) whereClause.restockValue[Op.gte] = Number(restockMin);
+            if (restockMax) whereClause.restockValue[Op.lte] = Number(restockMax);
+        }
+
+        // Query with pagination + filtering + seller scoping
+        const { count, rows } = await Inventory.findAndCountAll({
+            where: whereClause,
             include: [
                 {
                     model: Product,
@@ -14,9 +47,18 @@ export const getAllInventories = async (req, res) => {
                     where: { seller: req.user.id },
                 },
             ],
+            limit: Number(limit),
+            offset: Number(offset),
+            distinct: true,
+            order: [['createdAt', 'DESC']],
         });
 
-        res.status(200).json(inventories);
+        res.status(200).json({
+            inventories: rows,
+            total: count,
+            limit: Number(limit),
+            offset: Number(offset),
+        });
     } catch (error) {
         console.error('Error fetching inventories:', error);
         res.status(500).json({

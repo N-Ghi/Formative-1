@@ -13,19 +13,57 @@ import { getAllProducts, getProductById, getMyProducts, createProduct, updatePro
  * /api/products:
  *   get:
  *     summary: Get all products
+ *     description: |
+ *       Retrieves paginated product records. Supports optional filtering by seller ID or partial seller name.
+ *       Each product includes its seller details.
  *     tags:
  *       - Products
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: seller
+ *         schema:
+ *           type: string
+ *         description: Filter products by seller ID or name (partial match supported).
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of products to return per page.
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Number of products to skip before starting to collect the result set.
  *     responses:
  *       200:
- *         description: List of products
+ *         description: Paginated list of products matching filters.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
+ *               type: object
+ *               properties:
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of matching records.
+ *                   example: 120
+ *                 limit:
+ *                   type: integer
+ *                   example: 10
+ *                 offset:
+ *                   type: integer
+ *                   example: 0
+ *       401:
+ *         description: Unauthorized – Missing or invalid authentication token.
+ *       500:
+ *         description: Server error – Failed to fetch products.
  */
 router.get('/products', protect, getAllProducts);
 /**
@@ -153,19 +191,72 @@ router.get('/products/mine', protect, getMyProducts);
  * /api/inventory:
  *   get:
  *     summary: Get all inventory items for the authenticated user's products
+ *     description: |
+ *       Retrieves paginated inventory records belonging to the authenticated seller.
+ *       Supports optional filtering by quantity and restock value ranges.
  *     tags:
  *       - Inventory
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of items to return per page.
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Number of items to skip before starting to collect the result set.
+ *       - in: query
+ *         name: quantityMin
+ *         schema:
+ *           type: integer
+ *         description: Minimum inventory quantity to filter results.
+ *       - in: query
+ *         name: quantityMax
+ *         schema:
+ *           type: integer
+ *         description: Maximum inventory quantity to filter results.
+ *       - in: query
+ *         name: restockMin
+ *         schema:
+ *           type: integer
+ *         description: Minimum restock value to filter results.
+ *       - in: query
+ *         name: restockMax
+ *         schema:
+ *           type: integer
+ *         description: Maximum restock value to filter results.
  *     responses:
  *       200:
- *         description: List of inventory
+ *         description: Paginated list of inventory items matching filters.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Inventory'
+ *               type: object
+ *               properties:
+ *                 inventories:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Inventory'
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of matching records.
+ *                   example: 42
+ *                 limit:
+ *                   type: integer
+ *                   example: 10
+ *                 offset:
+ *                   type: integer
+ *                   example: 0
+ *       401:
+ *         description: Unauthorized – Missing or invalid authentication token.
+ *       500:
+ *         description: Server error – Failed to fetch inventories.
  */
 router.get('/inventory',protect, getAllInventories);
 /**
