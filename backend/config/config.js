@@ -3,24 +3,18 @@ dotenv.config();
 
 export default {
   development: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.HOST,
-    dialect: 'mysql'
+    dialect: 'sqlite',
+    storage: './database.sqlite',
+    logging: false
   },
   test: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.HOST,
-    dialect: 'mysql'
+    dialect: 'sqlite',
+    storage: './test-database.sqlite',
+    logging: false
   },
   production: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.HOST,
-    dialect: 'mysql'
+    dialect: 'sqlite',
+    storage: './production-database.sqlite',
+    logging: false
   }
 };
