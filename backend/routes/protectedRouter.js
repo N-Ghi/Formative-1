@@ -304,7 +304,7 @@ router.get('/inventory/get/:id', protect, getInventoryById);
  *             schema:
  *               $ref: '#/components/schemas/Inventory'
  */
-router.post('/inventory', createInventory);
+router.post('/inventory', protect, createInventory);
 /**
  * @swagger
  * /api/inventory/update/{id}:
@@ -332,7 +332,7 @@ router.post('/inventory', createInventory);
  *             schema:
  *               $ref: '#/components/schemas/Inventory'
  */
-router.put('/inventory/update/:id', updateInventory);
+router.put('/inventory/update/:id', protect, updateInventory);
 /**
  * @swagger
  * /api/inventory/delete/{id}:
@@ -350,6 +350,6 @@ router.put('/inventory/update/:id', updateInventory);
  *       204:
  *         description: Deleted
  */
-router.delete('/inventory/delete/:id', deleteInventory);
+router.delete('/inventory/delete/:id', protect, deleteInventory);
 
 export default router;
