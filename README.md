@@ -71,26 +71,8 @@ cd backend
 npm install
 ```
 
-3. **Configure Backend Environment Variables**
 
-Create a `.env` file in the `backend` directory (follow `.env.example`):
-
-```env
-DB_HOST=localhost
-DB_USER=your_mysql_username
-DB_PASSWORD=your_mysql_password
-DB_NAME=inventory_db
-DB_PORT=3306
-
-JWT_SECRET=your_strong_jwt_secret_here
-PORT=4000
-
-NODE_ENV=development
-```
-
-**⚠️ Important**: Never commit your `.env` file to version control
-
-4. **Initialize Database**
+3. **Initialize Database**
 
 ```bash
 # Create the database
@@ -105,7 +87,7 @@ npx sequelize-cli db:migrate
 npx sequelize-cli db:seed:all
 ```
 
-5. **Start Backend Server**
+4. **Start Backend Server**
 
 ```bash
 # Development mode with nodemon
@@ -117,7 +99,7 @@ node app.js
 
 Backend will run on `http://127.0.0.1:4000`
 
-6. **Frontend Setup**
+5. **Frontend Setup**
 
 Open a new terminal window:
 
@@ -126,15 +108,8 @@ cd frontend
 npm install
 ```
 
-7. **Configure Frontend Environment Variables**
 
-Create a `.env` file in the `frontend` directory:
-
-```env
-VITE_API_URL=http://127.0.0.1:4000/api
-```
-
-8. **Start Frontend Development Server**
+6. **Start Frontend Development Server**
 
 ```bash
 npm run dev
@@ -142,11 +117,6 @@ npm run dev
 
 Frontend will run on `http://localhost:5173`
 
-### Demo Credentials
-
-Login with test account:
-- **Username**: `johndoe`
-- **Password**: `password123`
 
 ### Usage
 
