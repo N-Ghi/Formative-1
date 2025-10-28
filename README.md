@@ -42,7 +42,7 @@ With an intuitive user interface, robust backend architecture using Sequelize OR
 
 - **Frontend**: React 18+ with Vite as build tool
 - **Backend**: Node.js with Express.js framework (ES modules)
-- **Database**: MySQL with Sequelize ORM
+- **Database**: SQLite with Sequelize ORM
 - **Authentication**: JWT (JSON Web Tokens)
 - **HTTP Client**: Axios for API communication
 - **Styling**: Custom CSS for responsive design
@@ -53,7 +53,6 @@ With an intuitive user interface, robust backend architecture using Sequelize OR
 ### Prerequisites
 
 - Node.js 16+ and npm
-- MySQL 8.0+
 - Git
 
 ### Installation
@@ -72,15 +71,10 @@ npm install
 ```
 
 
-3. **Initialize Database**
+3. **Prepare the database**
 
 ```bash
-# Create the database
-mysql -u root -p
-CREATE DATABASE inventory_db;
-exit;
-
-# Run migrations (if using sequelize-cli)
+# Run migrations (using sequelize-cli)
 npx sequelize-cli db:migrate
 
 # Seed initial data (users and sample products)
@@ -96,8 +90,6 @@ npx nodemon app.js
 # Or production mode
 node app.js
 ```
-
-Backend will run on `http://127.0.0.1:4000`
 
 5. **Frontend Setup**
 
@@ -121,6 +113,7 @@ Frontend will run on `http://localhost:5173`
 ### Usage
 
 #### Getting Started
+
 1. **Login**: Use the demo credentials or register a new account
 2. **Dashboard**: View overview statistics, total products, low stock alerts, and quick action buttons
 3. **Explore Features**: Navigate through Products, Inventory, and Alerts sections
@@ -169,15 +162,13 @@ Formative-1/
 │   │   └── Inventory.js          # Inventory model
 │   ├── routes/
 │   │   ├── authRoutes.js         # Auth endpoints
-│   │   ├── productRoutes.js      # Product endpoints
-│   │   └── inventoryRoutes.js    # Inventory endpoints
+│   │   ├── protectedRoutes.js    # All other endpoints
 │   ├── middlewares/
 │   │   └── authMiddleware.js     # JWT verification
 │   ├── migrations/                # Database migrations
 │   ├── seeders/                   # Sample data seeders
 │   ├── utils/                     # Utility functions
 │   ├── .env.example               # Environment template
-│   ├── .gitignore
 │   ├── app.js                     # Express app entry
 │   ├── package.json
 │   └── README.md
@@ -202,13 +193,13 @@ Formative-1/
 │   │   ├── main.jsx               # Entry point
 │   │   └── App.css                # Global styles
 │   ├── .env.example
-│   ├── .gitignore
+│   ├── .gitignore                 # NPM default
 │   ├── index.html
 │   ├── vite.config.js
 │   ├── package.json
 │   └── README.md
 │
-├── .gitignore
+├── .gitignore                     # Global gitignore file
 ├── LICENSE
 └── README.md                      # This file
 ```
@@ -234,7 +225,7 @@ Formative-1/
 - `DELETE /api/inventory/:id` - Delete inventory item (protected)
 - `GET /api/inventory/alerts` - Get low stock alerts (protected)
 
-For detailed API documentation, check out the Swagger UI at `http://127.0.0.1:4000/api-docs` (when backend is running)
+For detailed API documentation, check out the Swagger UI at `http://127.0.0.1:{Your port}/api-docs` (when backend is running)
 
 ## Features in Detail
 
@@ -286,26 +277,29 @@ The optimized production build will be in `frontend/dist/`
 ### Common Issues
 
 **Database Connection Failed**
-- Ensure MySQL server is running
-- Verify credentials in `.env` file
-- Check if database exists: `CREATE DATABASE inventory_db;`
+
+- Make sure you run migrations fro the tables to be created
 
 **Backend Won't Start**
-- Check if port 4000 is available
+
+- Check if your specified port is available
 - Verify all environment variables are set
 - Run `npm install` to ensure dependencies are installed
 
 **Frontend Can't Connect to Backend**
-- Verify backend is running on `http://127.0.0.1:4000`
+
+- Verify backend is running on `http://127.0.0.1:{Your port}`
 - Check `VITE_API_URL` in frontend `.env` file
 - Clear browser cache and restart dev server
 
 **Authentication Issues**
+
 - Ensure JWT_SECRET is set in backend `.env`
 - Check token expiration settings
 - Clear browser localStorage and login again
 
 **Migration/Seeding Failures**
+
 - Verify table names match model definitions
 - Check column constraints and data types
 - Ensure database user has proper permissions
