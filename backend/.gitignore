@@ -156,3 +156,8 @@ vite.config.ts.timestamp-*
 .AppleDouble
 .LSOverride
 
+# SQLite database files
+*.sqlite
+*.sqlite3
+*.db
+.database.sqlite
