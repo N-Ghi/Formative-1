@@ -155,10 +155,3 @@ vite.config.ts.timestamp-*
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# SQLite database files
-*.sqlite
-*.sqlite3
-*.db
-backend/database.sqlite
-
