@@ -2,18 +2,20 @@
 
 ## Overview
 
-This project includes a comprehensive Continuous Integration (CI) pipeline that automatically tests and validates code changes before they are merged.
+This project includes a comprehenvsive Continuous Integration (CI) pipeline that automatically tests and validates code changes before they are merged.
 
 ## Pipeline Triggers
 
 The CI pipeline automatically runs on:
 
 ### ✅ Push Events
+
 - Triggers on pushes to **any branch EXCEPT main**
 - Allows testing of feature branches and development work
 - Prevents accidental CI runs on production branch
 
 ### ✅ Pull Request Events
+
 - Triggers on pull requests targeting the **main branch**
 - Ensures code quality before merging to production
 - Required checks must pass before merge
@@ -22,7 +24,7 @@ The CI pipeline automatically runs on:
 
 The CI pipeline consists of three parallel jobs:
 
-```
+```mermaidflowchart
 CI Pipeline
 ├── Backend CI (runs in parallel)
 ├── Frontend CI (runs in parallel)
@@ -35,7 +37,7 @@ CI Pipeline
 
 **Purpose**: Validates backend code quality, tests, and Docker build
 
-### Steps:
+### Backend Steps
 
 1. **Checkout Code**
    - Uses: `actions/checkout@v4`
@@ -73,7 +75,7 @@ CI Pipeline
 
 **Purpose**: Validates frontend code quality, tests, and Docker build
 
-### Steps:
+### Frontend Steps
 
 1. **Checkout Code**
    - Uses: `actions/checkout@v4`
@@ -114,11 +116,12 @@ CI Pipeline
 
 **Purpose**: Validates full application stack
 
-### Prerequisites:
+### Prerequisites
+
 - Runs **only after** backend-ci and frontend-ci complete successfully
 - Uses: `needs: [backend-ci, frontend-ci]`
 
-### Steps:
+### Docker Compose Steps
 
 1. **Checkout Code**
    - Clones repository
@@ -147,7 +150,7 @@ CI Pipeline
 
 ## Quality Enforcement
 
-### ⚠️ Pipeline WILL Fail If:
+### ⚠️ Pipeline WILL Fail If
 
 1. **Linting Fails**
    - Code doesn't meet ESLint standards
@@ -237,6 +240,7 @@ docker-compose up
 **Test Files**: `backend/__tests__/**/*.test.js`
 
 **Features**:
+
 - ES Modules support
 - Node.js test environment
 - Code coverage reporting
@@ -249,6 +253,7 @@ docker-compose up
 **Test Files**: `frontend/src/**/*.test.{js,jsx}`
 
 **Features**:
+
 - React Testing Library
 - jsdom environment
 - Component testing
@@ -263,6 +268,7 @@ docker-compose up
 **Configuration**: `backend/.eslintrc.json`
 
 **Rules**:
+
 - ES2021 syntax
 - 4-space indentation
 - Single quotes
@@ -274,6 +280,7 @@ docker-compose up
 **Configuration**: `frontend/eslint.config.js`
 
 **Rules**:
+
 - React best practices
 - React Hooks rules
 - React Refresh compatibility
@@ -286,6 +293,7 @@ docker-compose up
 **Location**: `.github/workflows/ci.yml`
 
 **Status Badge**: Add to README.md
+
 ```markdown
 ![CI Pipeline](https://github.com/YOUR_USERNAME/Formative-1/workflows/CI%20Pipeline/badge.svg)
 ```
@@ -468,6 +476,7 @@ describe('Component', () => {
 ## Support
 
 For CI pipeline issues:
+
 1. Check workflow logs in GitHub Actions
 2. Run tests locally to reproduce
 3. Review this documentation
@@ -478,4 +487,3 @@ For CI pipeline issues:
 **Last Updated**: November 10, 2025  
 **Version**: 1.0.0  
 **Status**: ✅ Active
-

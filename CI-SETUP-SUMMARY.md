@@ -9,9 +9,11 @@ A comprehensive CI/CD pipeline has been created that automatically tests, lints,
 ## 📦 Files Created (13 files)
 
 ### 1. GitHub Actions Workflow
+
 - ✅ **`.github/workflows/ci.yml`** - Main CI pipeline configuration
 
 ### 2. Backend Testing Setup (5 files)
+
 - ✅ **`backend/.eslintrc.json`** - ESLint configuration
 - ✅ **`backend/jest.config.js`** - Jest test configuration
 - ✅ **`backend/__tests__/app.test.js`** - Backend unit tests
@@ -19,6 +21,7 @@ A comprehensive CI/CD pipeline has been created that automatically tests, lints,
 - ✅ **Added dependencies**: eslint, jest
 
 ### 3. Frontend Testing Setup (5 files)
+
 - ✅ **`frontend/vitest.config.js`** - Vitest configuration
 - ✅ **`frontend/src/test/setup.js`** - Test environment setup
 - ✅ **`frontend/src/test/App.test.jsx`** - Frontend unit tests
@@ -26,6 +29,7 @@ A comprehensive CI/CD pipeline has been created that automatically tests, lints,
 - ✅ **Added dependencies**: vitest, @testing-library/react, jsdom
 
 ### 4. Documentation (2 files)
+
 - ✅ **`CI-PIPELINE.md`** - Comprehensive CI documentation
 - ✅ **`README.md`** - Updated with CI/CD section
 
@@ -34,6 +38,7 @@ A comprehensive CI/CD pipeline has been created that automatically tests, lints,
 ## 🎯 Pipeline Features
 
 ### ✅ **Trigger Configuration**
+
 ```yaml
 Triggers on:
 ✓ Push to any branch (except main)
@@ -43,6 +48,7 @@ Triggers on:
 ### ✅ **Pipeline Jobs**
 
 #### Job 1: Backend CI
+
 1. ✓ Checkout code
 2. ✓ Set up Node.js 20
 3. ✓ Install dependencies (`npm ci`)
@@ -51,6 +57,7 @@ Triggers on:
 6. ✓ Build Docker image - **FAILS ON ERROR**
 
 #### Job 2: Frontend CI
+
 1. ✓ Checkout code
 2. ✓ Set up Node.js 20
 3. ✓ Install dependencies (`npm ci`)
@@ -60,6 +67,7 @@ Triggers on:
 7. ✓ Build Docker image - **FAILS ON ERROR**
 
 #### Job 3: Docker Compose Integration
+
 1. ✓ Checkout code
 2. ✓ Build with Docker Compose - **FAILS ON ERROR**
 3. ✓ Start services
@@ -69,6 +77,7 @@ Triggers on:
 ### ✅ **Quality Enforcement**
 
 Pipeline **FAILS** if:
+
 - ❌ Linting errors found
 - ❌ Any test fails
 - ❌ Docker build fails
@@ -86,6 +95,7 @@ Pipeline **FAILS** if:
 **Test Files**: `backend/__tests__/**/*.test.js`
 
 **Run Commands**:
+
 ```bash
 cd backend
 npm install           # Install dependencies
@@ -96,6 +106,7 @@ npm run test:watch   # Run tests in watch mode
 ```
 
 **Tests Included**:
+
 - ✅ Environment configuration
 - ✅ ES modules support
 - ✅ Database configuration
@@ -111,6 +122,7 @@ npm run test:watch   # Run tests in watch mode
 **Test Files**: `frontend/src/test/**/*.test.{js,jsx}`
 
 **Run Commands**:
+
 ```bash
 cd frontend
 npm install           # Install dependencies
@@ -120,6 +132,7 @@ npm run test:watch   # Run tests in watch mode
 ```
 
 **Tests Included**:
+
 - ✅ App renders without crashing
 - ✅ Environment variables
 - ✅ React rendering
@@ -132,6 +145,7 @@ npm run test:watch   # Run tests in watch mode
 ### Backend package.json
 
 **Added Scripts**:
+
 ```json
 {
   "scripts": {
@@ -144,6 +158,7 @@ npm run test:watch   # Run tests in watch mode
 ```
 
 **Added Dependencies**:
+
 ```json
 {
   "devDependencies": {
@@ -156,6 +171,7 @@ npm run test:watch   # Run tests in watch mode
 ### Frontend package.json
 
 **Added Scripts**:
+
 ```json
 {
   "scripts": {
@@ -166,6 +182,7 @@ npm run test:watch   # Run tests in watch mode
 ```
 
 **Added Dependencies**:
+
 ```json
 {
   "devDependencies": {
@@ -205,6 +222,7 @@ npm run test:watch   # Run tests in watch mode
 ### Frontend ESLint
 
 Already configured with:
+
 - React best practices
 - React Hooks rules
 - Modern JavaScript standards
@@ -265,7 +283,7 @@ git push origin your-branch
 
 ## 📊 Pipeline Workflow
 
-```
+```mermaidflowchart
 Push to branch / Create PR
          ↓
    CI Pipeline Starts
@@ -294,21 +312,25 @@ Backend CI  Frontend CI (parallel)
 ## 🎨 CI Pipeline Advantages
 
 ### ✅ **Automated Quality Checks**
+
 - No manual testing required
 - Consistent code quality
 - Early bug detection
 
 ### ✅ **Faster Development**
+
 - Immediate feedback
 - Parallel job execution
 - Cached dependencies
 
 ### ✅ **Better Collaboration**
+
 - Code review confidence
 - Prevent bad merges
 - Team standards enforcement
 
 ### ✅ **Docker Validation**
+
 - Ensures deployability
 - Catches build issues early
 - Full stack integration tests
@@ -318,6 +340,7 @@ Backend CI  Frontend CI (parallel)
 ## 📖 Documentation
 
 ### Main Documentation
+
 - **[CI-PIPELINE.md](./CI-PIPELINE.md)** - Comprehensive CI guide
   - Pipeline structure
   - Troubleshooting
@@ -325,6 +348,7 @@ Backend CI  Frontend CI (parallel)
   - Test examples
 
 ### README Updates
+
 - **[README.md](./README.md)** - Updated with CI/CD section
   - Quick overview
   - Local testing commands
@@ -348,6 +372,7 @@ Before the pipeline will work, ensure:
 ## 🧪 Test Coverage
 
 ### Backend Tests
+
 - ✅ Environment configuration (2 tests)
 - ✅ Database configuration (2 tests)
 - ✅ JWT utilities (1 test)
@@ -355,6 +380,7 @@ Before the pipeline will work, ensure:
 - **Total: 6 tests**
 
 ### Frontend Tests
+
 - ✅ App rendering (2 tests)
 - ✅ React functionality (2 tests)
 - ✅ Router configuration (1 test)
@@ -367,6 +393,7 @@ Before the pipeline will work, ensure:
 ## 🎯 Next Steps for Users
 
 ### Immediate (Required)
+
 1. **Install dependencies**:
    ```bash
    cd backend && npm install
@@ -374,6 +401,7 @@ Before the pipeline will work, ensure:
    ```
 
 2. **Verify tests pass locally**:
+
    ```bash
    cd backend && npm test
    cd ../frontend && npm test
@@ -382,12 +410,14 @@ Before the pipeline will work, ensure:
 3. **Push to GitHub** to trigger the pipeline
 
 ### Short-term (Recommended)
+
 1. Add more tests for your specific features
 2. Increase test coverage
 3. Add integration tests
 4. Set up branch protection rules
 
 ### Long-term (Optional)
+
 1. Add code coverage reporting
 2. Add E2E tests
 3. Add security scanning
@@ -401,6 +431,7 @@ Before the pipeline will work, ensure:
 ### Issue: "npm ci" fails
 
 **Solution**:
+
 ```bash
 # Delete package-lock.json and node_modules
 rm -rf node_modules package-lock.json
@@ -412,6 +443,7 @@ git commit -m "Update package-lock.json"
 ### Issue: Tests fail locally
 
 **Solution**:
+
 ```bash
 # Check Node.js version (should be 16+)
 node --version
@@ -426,6 +458,7 @@ npm test -- --verbose
 ### Issue: Linting fails
 
 **Solution**:
+
 ```bash
 # Auto-fix linting issues
 npm run lint:fix
@@ -437,6 +470,7 @@ npm run lint
 ### Issue: Docker build fails
 
 **Solution**:
+
 ```bash
 # Build without cache
 docker build --no-cache -t test .

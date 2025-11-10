@@ -5,11 +5,8 @@ import App from '../App';
 
 describe('Frontend Application', () => {
     it('should render without crashing', () => {
-        render(
-            <BrowserRouter>
-                <App />
-            </BrowserRouter>
-        );
+        render(<App />);
+
         
         // Basic test to ensure app renders
         expect(document.body).toBeDefined();
