@@ -13,6 +13,40 @@ Our Inventory Management System addresses these challenges by providing an acces
 - Kevine Umutoni -frontend developer
 - Palvis Paul Ntawukamenya frontend developer
 
+## CI/CD Pipeline
+
+This project includes an automated Continuous Integration (CI) pipeline that ensures code quality and reliability:
+
+### 🔄 **Automated Testing**
+- ✅ Runs on every push (except to main branch)
+- ✅ Runs on pull requests to main
+- ✅ Linting checks for code quality
+- ✅ Unit tests for both backend and frontend
+- ✅ Docker build verification
+
+### 📊 **Pipeline Jobs**
+1. **Backend CI**: Linting, testing, and Docker build
+2. **Frontend CI**: Linting, testing, and Docker build  
+3. **Docker Compose**: Full stack integration test
+
+### 🚫 **Quality Gates**
+The pipeline **fails** if:
+- Linting errors are found
+- Any test fails
+- Docker builds fail
+
+### 📖 **Documentation**
+For detailed CI pipeline information, see [CI-PIPELINE.md](./CI-PIPELINE.md)
+
+### 🧪 **Run Tests Locally**
+```bash
+# Backend
+cd backend && npm install && npm test
+
+# Frontend
+cd frontend && npm install && npm test
+```
+
 ## Project Overview
 
 The Inventory Management System is a modern full-stack web application designed to streamline inventory operations for businesses of all sizes. Built with React on the frontend and Express.js on the backend, the application provides real-time visibility into stock levels, automated alerts for low inventory, and powerful search and filtering capabilities.
@@ -54,8 +88,386 @@ With an intuitive user interface, robust backend architecture using Sequelize OR
 
 - Node.js 16+ and npm
 - Git
+- Docker and Docker Compose (optional, for containerized deployment)
 
-### Installation
+### Quick Start with Docker 🐳 (Recommended)
+
+The easiest way to get the application running is with Docker Compose:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/N-Ghi/Formative-1.git
+cd Formative-1
+
+# 2. Start all services
+docker-compose up
+
+# Or start in background
+docker-compose up -d
+```
+
+**Access the application:**
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3000/api
+- API Docs: http://localhost:3000/api/docs
+
+See the "Running with Docker Compose" section below for complete instructions.
+
+---
+
+## Running with Docker Compose
+
+### Prerequisites for Docker Setup
+
+Before you begin, ensure you have the following installed:
+- **Docker** (version 20.10 or higher) - [Download Docker](https://docs.docker.com/get-docker/)
+- **Docker Compose** (version 2.0 or higher) - Included with Docker Desktop
+
+Verify your installation:
+```bash
+docker --version
+docker-compose --version
+```
+
+### Step-by-Step Setup with Docker Compose
+
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/N-Ghi/Formative-1.git
+cd Formative-1
+```
+
+#### 2. Configure Environment Variables (Optional)
+
+Docker Compose will use default values, but you can create a `.env` file to customize:
+
+```bash
+# Create .env file (optional)
+touch .env
+
+# Add your configuration:
+echo "JWT_SECRET=your-secure-secret-key" >> .env
+echo "PORT=3000" >> .env
+echo "FRONTEND_URL=http://localhost:5173" >> .env
+echo "VITE_API_URL=http://localhost:3000/api" >> .env
+```
+
+**Important:** Update the `JWT_SECRET` with a secure random string for production!
+
+#### 3. Build and Start Services
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Or start in detached mode (background)
+docker-compose up -d --build
+```
+
+This will:
+- Build Docker images for frontend and backend
+- Start both services
+- Create a shared network for inter-service communication
+- Mount source code for hot-reload during development
+
+#### 4. Run Database Migrations
+In a new terminal window (or if running in detached mode):
+```bash
+# Run database migrations to create tables
+docker-compose exec backend npx sequelize-cli db:migrate
+
+# Seed the database with sample data
+docker-compose exec backend npx sequelize-cli db:seed:all
+```
+
+#### 5. Access the Application
+Once all services are running, access the application at:
+- **Frontend Application**: http://localhost:5173
+- **Backend API**: http://localhost:3000/api
+- **API Documentation (Swagger)**: http://localhost:3000/api/docs
+
+### Common Docker Compose Commands
+
+#### Starting and Stopping
+
+```bash
+# Start services (foreground - see logs)
+docker-compose up
+
+# Start services in background
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# Stop and remove volumes (⚠️ deletes database)
+docker-compose down -v
+```
+
+#### Viewing Logs
+
+```bash
+# View logs from all services
+docker-compose logs
+
+# Follow logs in real-time
+docker-compose logs -f
+
+# View logs for specific service
+docker-compose logs backend
+docker-compose logs frontend
+
+# Follow logs for specific service
+docker-compose logs -f backend
+```
+
+#### Managing Services
+
+```bash
+# Check status of services
+docker-compose ps
+
+# Restart all services
+docker-compose restart
+
+# Restart specific service
+docker-compose restart backend
+docker-compose restart frontend
+
+# Rebuild services
+docker-compose build
+
+# Rebuild without cache
+docker-compose build --no-cache
+```
+
+#### Database Operations
+
+```bash
+# Run migrations
+docker-compose exec backend npx sequelize-cli db:migrate
+
+# Undo last migration
+docker-compose exec backend npx sequelize-cli db:migrate:undo
+
+# Reset database (undo all migrations)
+docker-compose exec backend npx sequelize-cli db:migrate:undo:all
+
+# Re-run migrations
+docker-compose exec backend npx sequelize-cli db:migrate
+
+# Seed database
+docker-compose exec backend npx sequelize-cli db:seed:all
+
+# Undo all seeds
+docker-compose exec backend npx sequelize-cli db:seed:undo:all
+```
+
+#### Accessing Container Shell
+
+```bash
+# Access backend container
+docker-compose exec backend sh
+
+# Access frontend container
+docker-compose exec frontend sh
+
+# Run commands inside container
+docker-compose exec backend npm install <package-name>
+docker-compose exec frontend npm install <package-name>
+```
+
+
+### Development Workflow with Docker
+
+1. **Start the services:**
+   ```bash
+   docker-compose up
+   ```
+
+2. **Make code changes:**
+   - Frontend and backend have hot-reload enabled
+   - Changes are automatically reflected without rebuilding
+
+3. **View logs for debugging:**
+   ```bash
+   docker-compose logs -f
+   ```
+
+4. **Run database migrations when models change:**
+   ```bash
+   docker-compose exec backend npx sequelize-cli db:migrate
+   ```
+
+5. **Stop services when done:**
+   ```bash
+   docker-compose down
+   ```
+
+### Docker Compose Configuration
+
+The project includes `docker-compose.yml` which provides:
+
+- ✅ Hot-reload for instant code changes
+- ✅ Source code mounted as volumes
+- ✅ Debug-friendly logging
+- ✅ Nodemon for backend auto-restart
+- ✅ Vite HMR for frontend
+- ✅ Automatic service networking
+- ✅ SQLite database persistence
+
+### Troubleshooting Docker Issues
+
+#### Services Won't Start
+
+```bash
+# Check logs for errors
+docker-compose logs
+
+# Try rebuilding without cache
+docker-compose down
+docker-compose build --no-cache
+docker-compose up
+```
+
+#### Port Already in Use
+
+```bash
+# Check what's using the port
+lsof -i :3000  # Backend port
+lsof -i :5173  # Frontend port
+
+# Kill the process or change ports in docker-compose.yml
+```
+
+#### Database Connection Issues
+
+```bash
+# Ensure migrations have been run
+docker-compose exec backend npx sequelize-cli db:migrate
+
+# Reset database if needed
+docker-compose exec backend npx sequelize-cli db:migrate:undo:all
+docker-compose exec backend npx sequelize-cli db:migrate
+docker-compose exec backend npx sequelize-cli db:seed:all
+```
+
+#### Container Keeps Restarting
+
+```bash
+# Check container logs
+docker-compose logs backend
+
+# Check environment variables
+docker-compose exec backend env
+
+# Verify .env file exists and has correct values
+cat .env
+```
+
+#### Hot-Reload Not Working
+
+```bash
+# Ensure volumes are mounted correctly
+docker-compose down
+docker-compose up --build
+
+# Check volume permissions (Linux)
+sudo chown -R $USER:$USER ./backend ./frontend
+```
+
+#### Clean Slate / Start Fresh
+
+```bash
+# Remove everything and start over
+docker-compose down -v           # Stop and remove volumes
+docker system prune -f           # Clean up Docker system
+docker-compose up --build        # Rebuild and start
+```
+
+### Environment Variables
+
+Key environment variables used in Docker setup:
+
+#### Backend (.env)
+```env
+PORT=3000                        # Backend server port
+NODE_ENV=development             # Environment mode
+FRONTEND_URL=http://localhost:5173  # Frontend URL for CORS
+JWT_SECRET=your-secret-key       # JWT secret (⚠️ change in production!)
+JWT_EXPIRES_IN=7d               # JWT expiration time
+```
+
+#### Frontend (.env)
+```env
+VITE_API_URL=http://localhost:3000/api  # Backend API endpoint
+```
+
+### Performance Optimization
+
+For better performance during development:
+
+```bash
+# Use Docker BuildKit for faster builds
+export DOCKER_BUILDKIT=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+
+# Then run docker-compose commands as usual
+docker-compose build
+```
+
+### Data Persistence
+
+The SQLite database is persisted in the `backend/` directory:
+- **File**: `backend/database.sqlite`
+- **Backup**: Simply copy this file
+- **Restore**: Replace with backed-up file
+
+```bash
+# Backup database
+cp backend/database.sqlite backend/database.sqlite.backup
+
+# Restore database
+cp backend/database.sqlite.backup backend/database.sqlite
+```
+
+### Advanced Usage
+
+#### Running Tests in Containers
+
+```bash
+# Run backend tests
+docker-compose exec backend npm test
+
+# Run frontend tests
+docker-compose exec frontend npm test
+```
+
+#### Installing New Dependencies
+
+```bash
+# Backend
+docker-compose exec backend npm install <package-name>
+docker-compose restart backend
+
+# Frontend
+docker-compose exec frontend npm install <package-name>
+docker-compose restart frontend
+
+# Rebuild if package.json changed
+docker-compose build
+```
+
+#### Customizing Docker Compose
+
+You can modify `docker-compose.yml` to:
+- Change port mappings
+- Add environment variables
+- Mount additional volumes
+- Add more services (Redis, PostgreSQL, etc.)
+
+---
+
+### Manual Installation
 
 1. **Clone the repository**
 ```bash
@@ -151,7 +563,8 @@ Frontend will run on `http://localhost:5173`
 Formative-1/
 ├── backend/
 │   ├── config/
-│   │   └── database.js           # Database configuration
+│   │   └── config.js              # Database configuration
+│   │   └── swagger.js             # Swagger documentation config
 │   ├── controllers/
 │   │   ├── authController.js     # Authentication logic
 │   │   ├── productController.js  # Product CRUD operations
@@ -168,7 +581,8 @@ Formative-1/
 │   ├── migrations/                # Database migrations
 │   ├── seeders/                   # Sample data seeders
 │   ├── utils/                     # Utility functions
-│   ├── .env.example               # Environment template
+│   ├── .dockerignore              # Docker ignore file
+│   ├── dockerfile                 # Backend Docker config
 │   ├── app.js                     # Express app entry
 │   ├── package.json
 │   └── README.md
@@ -192,13 +606,15 @@ Formative-1/
 │   │   ├── App.jsx                # Main app component
 │   │   ├── main.jsx               # Entry point
 │   │   └── App.css                # Global styles
-│   ├── .env.example
+│   ├── .dockerignore              # Docker ignore file
+│   ├── dockerfile                 # Frontend Docker config
 │   ├── .gitignore                 # NPM default
 │   ├── index.html
 │   ├── vite.config.js
 │   ├── package.json
 │   └── README.md
 │
+├── docker-compose.yml             # Docker Compose configuration
 ├── .gitignore                     # Global gitignore file
 ├── LICENSE
 └── README.md                      # This file
@@ -271,6 +687,38 @@ npm run build
 ```
 
 The optimized production build will be in `frontend/dist/`
+
+## Docker Quick Reference
+
+For complete Docker Compose instructions, see the **"Running with Docker Compose"** section above.
+
+### Quick Commands
+
+```bash
+# Start services
+docker-compose up
+
+# Start in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Restart services
+docker-compose restart
+
+# Rebuild containers
+docker-compose build
+
+# Database migrations
+docker-compose exec backend npx sequelize-cli db:migrate
+
+# Seed database
+docker-compose exec backend npx sequelize-cli db:seed:all
+```
 
 ## Troubleshooting
 

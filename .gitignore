@@ -151,6 +151,11 @@ vite.config.ts.timestamp-*
 *.sln
 *.sw?
 
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
 # Mac system files
 .DS_Store
 .AppleDouble

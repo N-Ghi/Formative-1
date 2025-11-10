@@ -33,7 +33,7 @@ const RegisterForm = ({ onToggle }) => {
       return;
     }
 
-    const { confirmPassword, ...userData } = formData;
+    const { confirmPassword: _confirmPassword, ...userData } = formData;
     const result = await register(userData);
     
     if (!result.success) {

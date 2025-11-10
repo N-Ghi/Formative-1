@@ -1,5 +1,5 @@
-import { User } from '../models/userModel.js';
-import { signToken } from '../utils/jwt.js';
+import { User } from "../models/userModel.js";
+import { signToken } from "../utils/jwt.js";
 
 /**
  * Authentication controller
@@ -23,17 +23,27 @@ export const register = async (req, res) => {
     try {
         const user = await User.create(req.body);
         if (!user) {
-            return res.status(400).json({ message: 'User registration failed' });
+            return res
+                .status(400)
+                .json({ message: "User registration failed" });
         }
 
         const token = signToken(user.id);
         res.status(201).json({
             token,
-            user: { email: user.email, firstName: user.firstName, lastName: user.lastName, username: user.username },
+            user: {
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                username: user.username,
+            },
         });
     } catch (err) {
         // Return the error message, but avoid leaking stack traces in production
-        res.status(400).json({ message: 'Registration failed', error: err.message });
+        res.status(400).json({
+            message: "Registration failed",
+            error: err.message,
+        });
     }
 };
 
@@ -51,11 +61,17 @@ export const login = async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ where: { username: username } });
     if (!user || !(await user.comparePassword(password))) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(401).json({ message: "Invalid credentials" });
     }
     const token = signToken(user.id);
-    res.json({ token,
-        user: { email: user.email, firstName: user.firstName, lastName: user.lastName, username: user.username },
+    res.json({
+        token,
+        user: {
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            username: user.username,
+        },
     });
 };
 
@@ -71,7 +87,7 @@ export const login = async (req, res) => {
  */
 export const getProfile = async (req, res) => {
     if (!req.user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
     }
     res.json(req.user);
 };
