@@ -123,18 +123,31 @@ jobs:
       - name: Build with Docker Compose
         run: docker compose build
       
-      # 3. Verify services start
+      # 3. Set up backend .env files
+      - name: Create backend .env
+        run: |
+          echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" > ./backend/.env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> ./backend/.env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> ./backend/.env
+          echo "SEED_PASSWORD=${{ secrets.SEED_PASSWORD }}" >> ./backend/.env
+          echo "PORT=${{ secrets.PORT }}" >> ./backend/.env
+      # 4. Set up frontend .env files
+      - name: Create frontend .env
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > ./frontend/.env
+        
+      # 5. Verify services start
       - name: Start services
         run: docker compose up -d
       
-      # 4. Wait for services to be ready
+      # 6. Wait for services to be ready
       - name: Wait for services
         run: sleep 10
       
-      # 5. Check services are running
+      # 7. Check services are running
       - name: Check services health
         run: docker compose ps
       
-      # 6. Cleanup
+      # 8. Cleanup
       - name: Stop services
         run: docker compose down
