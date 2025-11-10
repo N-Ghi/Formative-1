@@ -1,7 +1,7 @@
-import { Router } from 'express';
-import { protect } from '../middlewares/authMiddleware.js';
+import { Router } from "express";
+import { protect } from "../middlewares/authMiddleware.js";
 const router = Router();
-import { register, login, getProfile } from '../controllers/authController.js';
+import { register, login, getProfile } from "../controllers/authController.js";
 
 /**
  * Auth Router
@@ -34,7 +34,7 @@ import { register, login, getProfile } from '../controllers/authController.js';
  *       400:
  *         description: Validation error
  */
-router.post('/register', register);
+router.post("/register", register);
 
 /**
  * @swagger
@@ -70,7 +70,7 @@ router.post('/register', register);
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', login);
+router.post("/login", login);
 
 /**
  * @swagger
@@ -91,6 +91,6 @@ router.post('/login', login);
  *       401:
  *         description: Unauthorized
  */
-router.get('/me', protect, getProfile);
+router.get("/me", protect, getProfile);
 
 export default router;

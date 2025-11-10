@@ -1,6 +1,6 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
-import { Sequelize } from 'sequelize';
+import { Sequelize } from "sequelize";
 
 /**
  * Database utility
@@ -9,9 +9,9 @@ import { Sequelize } from 'sequelize';
  * Uses SQLite for easier development and testing.
  */
 const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: './database.sqlite',
-    logging: false
+    dialect: "sqlite",
+    storage: "./database.sqlite",
+    logging: false,
 });
 
 export { sequelize };

@@ -1,20 +1,16 @@
 export default {
-    testEnvironment: 'node',
+    testEnvironment: "node",
     transform: {},
     moduleNameMapper: {
-        '^(\\.{1,2}/.*)\\.js$': '$1',
+        "^(\\.{1,2}/.*)\\.js$": "$1",
     },
-    testMatch: [
-        '**/__tests__/**/*.test.js',
-        '**/?(*.)+(spec|test).js'
-    ],
+    testMatch: ["**/__tests__/**/*.test.js", "**/?(*.)+(spec|test).js"],
     collectCoverageFrom: [
-        '**/*.js',
-        '!**/node_modules/**',
-        '!**/coverage/**',
-        '!jest.config.js'
+        "**/*.js",
+        "!**/node_modules/**",
+        "!**/coverage/**",
+        "!jest.config.js",
     ],
-    coverageDirectory: 'coverage',
-    verbose: true
+    coverageDirectory: "coverage",
+    verbose: true,
 };
-

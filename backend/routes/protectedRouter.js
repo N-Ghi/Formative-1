@@ -1,11 +1,22 @@
-import { protect } from '../middlewares/authMiddleware.js';
-import { Router } from 'express';
+import { protect } from "../middlewares/authMiddleware.js";
+import { Router } from "express";
 const router = Router();
 
-import { getAllInventories, getInventoryById, createInventory, updateInventory, deleteInventory, } from 
-    '../controllers/inventoryController.js';
-import { getAllProducts, getProductById, getMyProducts, createProduct, updateProduct, deleteProduct} from 
-    '../controllers/productController.js';
+import {
+    getAllInventories,
+    getInventoryById,
+    createInventory,
+    updateInventory,
+    deleteInventory,
+} from "../controllers/inventoryController.js";
+import {
+    getAllProducts,
+    getProductById,
+    getMyProducts,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+} from "../controllers/productController.js";
 
 //===================Product Routes===================
 /**
@@ -65,7 +76,7 @@ import { getAllProducts, getProductById, getMyProducts, createProduct, updatePro
  *       500:
  *         description: Server error – Failed to fetch products.
  */
-router.get('/products', protect, getAllProducts);
+router.get("/products", protect, getAllProducts);
 /**
  * @swagger
  * /api/products/get/{id}:
@@ -91,7 +102,7 @@ router.get('/products', protect, getAllProducts);
  *       404:
  *         description: Not found
  */
-router.get('/products/get/:id', protect, getProductById);
+router.get("/products/get/:id", protect, getProductById);
 /**
  * @swagger
  * /api/products:
@@ -115,7 +126,7 @@ router.get('/products/get/:id', protect, getProductById);
  *             schema:
  *               $ref: '#/components/schemas/Product'
  */
-router.post('/products', protect, createProduct);
+router.post("/products", protect, createProduct);
 /**
  * @swagger
  * /api/products/update/{id}:
@@ -145,7 +156,7 @@ router.post('/products', protect, createProduct);
  *             schema:
  *               $ref: '#/components/schemas/Product'
  */
-router.put('/products/update/:id', protect, updateProduct),
+router.put("/products/update/:id", protect, updateProduct);
 /**
  * @swagger
  * /api/products/delete/{id}:
@@ -165,7 +176,9 @@ router.put('/products/update/:id', protect, updateProduct),
  *       204:
  *         description: Deleted
  */
-router.delete('/products/delete/:id', protect, deleteProduct);
+router.delete("/products/delete/:id", protect, deleteProduct);
+
+router.delete("/products/delete/:id", protect, deleteProduct);
 /**
  * @swagger
  * /api/products/mine:
@@ -183,7 +196,7 @@ router.delete('/products/delete/:id', protect, deleteProduct);
  *               items:
  *                 $ref: '#/components/schemas/Product'
  */
-router.get('/products/mine', protect, getMyProducts);
+router.get("/products/mine", protect, getMyProducts);
 
 //===================Inventory Routes===================
 /**
@@ -258,7 +271,7 @@ router.get('/products/mine', protect, getMyProducts);
  *       500:
  *         description: Server error – Failed to fetch inventories.
  */
-router.get('/inventory',protect, getAllInventories);
+router.get("/inventory", protect, getAllInventories);
 /**
  * @swagger
  * /api/inventory/get/{id}:
@@ -282,7 +295,7 @@ router.get('/inventory',protect, getAllInventories);
  *             schema:
  *               $ref: '#/components/schemas/Inventory'
  */
-router.get('/inventory/get/:id', protect, getInventoryById);
+router.get("/inventory/get/:id", protect, getInventoryById);
 /**
  * @swagger
  * /api/inventory:
@@ -304,7 +317,7 @@ router.get('/inventory/get/:id', protect, getInventoryById);
  *             schema:
  *               $ref: '#/components/schemas/Inventory'
  */
-router.post('/inventory', protect, createInventory);
+router.post("/inventory", protect, createInventory);
 /**
  * @swagger
  * /api/inventory/update/{id}:
@@ -332,7 +345,7 @@ router.post('/inventory', protect, createInventory);
  *             schema:
  *               $ref: '#/components/schemas/Inventory'
  */
-router.put('/inventory/update/:id', protect, updateInventory);
+router.put("/inventory/update/:id", protect, updateInventory);
 /**
  * @swagger
  * /api/inventory/delete/{id}:
@@ -350,6 +363,6 @@ router.put('/inventory/update/:id', protect, updateInventory);
  *       204:
  *         description: Deleted
  */
-router.delete('/inventory/delete/:id', protect, deleteInventory);
+router.delete("/inventory/delete/:id", protect, deleteInventory);
 
 export default router;

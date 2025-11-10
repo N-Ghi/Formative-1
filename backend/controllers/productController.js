@@ -1,6 +1,6 @@
-import { Product } from '../models/productModel.js';
-import { User } from '../models/userModel.js';
-import { Op } from 'sequelize';
+import { Product } from "../models/productModel.js";
+import { User } from "../models/userModel.js";
+import { Op } from "sequelize";
 
 /**
  * Product controller
@@ -27,24 +27,40 @@ export const getAllProducts = async (req, res) => {
         const whereClause = {};
 
         if (seller) {
-            whereClause[Op.or] = [
-                { seller: { [Op.like]: `%${seller}%` } },
-            ];
+            whereClause[Op.or] = [{ seller: { [Op.like]: `%${seller}%` } }];
         }
 
         const { count, rows } = await Product.findAndCountAll({
             where: whereClause,
             include: [
-                { model: User, as: 'sellerDetails', attributes: ['id', 'firstName', 'lastName', 'username', 'email'] },
+                {
+                    model: User,
+                    as: "sellerDetails",
+                    attributes: [
+                        "id",
+                        "firstName",
+                        "lastName",
+                        "username",
+                        "email",
+                    ],
+                },
             ],
             limit: Number(limit),
             offset: Number(offset),
             distinct: true,
         });
 
-        res.json({ products: rows, total: count, limit: Number(limit), offset: Number(offset) });
+        res.json({
+            products: rows,
+            total: count,
+            limit: Number(limit),
+            offset: Number(offset),
+        });
     } catch (err) {
-        res.status(500).json({ message: 'Error fetching products', error: err.message });
+        res.status(500).json({
+            message: "Error fetching products",
+            error: err.message,
+        });
     }
 };
 
@@ -61,14 +77,29 @@ export const getAllProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
     try {
         const product = await Product.findByPk(req.params.id, {
-            include: [{ model: User, as: 'sellerDetails', attributes: ['id', 'firstName', 'lastName', 'username', 'email'] }],
+            include: [
+                {
+                    model: User,
+                    as: "sellerDetails",
+                    attributes: [
+                        "id",
+                        "firstName",
+                        "lastName",
+                        "username",
+                        "email",
+                    ],
+                },
+            ],
         });
         if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+            return res.status(404).json({ message: "Product not found" });
         }
         res.json(product);
     } catch (err) {
-        res.status(500).json({ message: 'Error fetching product', error: err.message });
+        res.status(500).json({
+            message: "Error fetching product",
+            error: err.message,
+        });
     }
 };
 
@@ -93,15 +124,33 @@ export const getMyProducts = async (req, res) => {
         const { count, rows } = await Product.findAndCountAll({
             where: whereClause,
             include: [
-                { model: User, as: 'sellerDetails', attributes: ['id', 'firstName', 'lastName', 'username', 'email'] },
+                {
+                    model: User,
+                    as: "sellerDetails",
+                    attributes: [
+                        "id",
+                        "firstName",
+                        "lastName",
+                        "username",
+                        "email",
+                    ],
+                },
             ],
             limit: Number(limit),
             offset: Number(offset),
-            order: [['createdAt', 'DESC']],
+            order: [["createdAt", "DESC"]],
         });
-        res.json({ products: rows, total: count, limit: Number(limit), offset: Number(offset) });
+        res.json({
+            products: rows,
+            total: count,
+            limit: Number(limit),
+            offset: Number(offset),
+        });
     } catch (err) {
-        res.status(500).json({ message: 'Error fetching user products', error: err.message });
+        res.status(500).json({
+            message: "Error fetching user products",
+            error: err.message,
+        });
     }
 };
 
@@ -118,11 +167,14 @@ export const getMyProducts = async (req, res) => {
 export const createProduct = async (req, res) => {
     try {
         const product = req.body;
-        product.seller = req.user.id;  // Ensure the seller is set to the authenticated user
+        product.seller = req.user.id; // Ensure the seller is set to the authenticated user
         const createdProduct = await Product.create(product);
         res.status(201).json(createdProduct);
     } catch (err) {
-        res.status(400).json({ message: 'Error creating product', error: err.message });
+        res.status(400).json({
+            message: "Error creating product",
+            error: err.message,
+        });
     }
 };
 
@@ -140,15 +192,30 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const product = await Product.findByPk(req.params.id, {
-            include: [{ model: User, as: 'sellerDetails', attributes: ['id', 'firstName', 'lastName', 'username', 'email'] }],
+            include: [
+                {
+                    model: User,
+                    as: "sellerDetails",
+                    attributes: [
+                        "id",
+                        "firstName",
+                        "lastName",
+                        "username",
+                        "email",
+                    ],
+                },
+            ],
         });
         if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+            return res.status(404).json({ message: "Product not found" });
         }
         await product.update(req.body);
         res.json(product);
     } catch (err) {
-        res.status(500).json({ message: 'Error updating product', error: err.message });
+        res.status(500).json({
+            message: "Error updating product",
+            error: err.message,
+        });
     }
 };
 
@@ -166,11 +233,14 @@ export const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByPk(req.params.id);
         if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+            return res.status(404).json({ message: "Product not found" });
         }
         await product.destroy();
-        res.status(204).json({ message: 'Product deleted' });
+        res.status(204).json({ message: "Product deleted" });
     } catch (err) {
-        res.status(500).json({ message: 'Error deleting product', error: err.message });
+        res.status(500).json({
+            message: "Error deleting product",
+            error: err.message,
+        });
     }
 };

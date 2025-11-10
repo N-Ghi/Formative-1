@@ -1,5 +1,5 @@
-import { User } from '../models/userModel.js';
-import pkg from 'jsonwebtoken';
+import { User } from "../models/userModel.js";
+import pkg from "jsonwebtoken";
 const { verify } = pkg;
 
 /**
@@ -13,37 +13,45 @@ const { verify } = pkg;
 export async function protect(req, res, next) {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'No token provided' });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ message: "No token provided" });
     }
 
-    const token = authHeader.split(' ')[1];
+    const token = authHeader.split(" ")[1];
 
     try {
         const decoded = verify(token, process.env.JWT_SECRET);
 
         if (decoded.exp && Date.now() >= decoded.exp * 1000) {
-            return res.status(401).json({ message: 'Token has expired' });
+            return res.status(401).json({ message: "Token has expired" });
         }
 
         const user = await User.findByPk(decoded.id, {
-            attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'createdAt', 'updatedAt'],
+            attributes: [
+                "id",
+                "firstName",
+                "lastName",
+                "username",
+                "email",
+                "createdAt",
+                "updatedAt",
+            ],
         });
 
         if (!user) {
-            return res.status(401).json({ message: 'User not found' });
+            return res.status(401).json({ message: "User not found" });
         }
 
         req.user = user;
         next();
     } catch (err) {
-        console.error('JWT Error:', err.message);
+        console.error("JWT Error:", err.message);
 
-        let message = 'Unauthorized';
-        if (err.name === 'TokenExpiredError') {
-            message = 'Token has expired';
-        } else if (err.name === 'JsonWebTokenError') {
-            message = 'Invalid token format';
+        let message = "Unauthorized";
+        if (err.name === "TokenExpiredError") {
+            message = "Token has expired";
+        } else if (err.name === "JsonWebTokenError") {
+            message = "Invalid token format";
         }
 
         res.status(401).json({ message });
