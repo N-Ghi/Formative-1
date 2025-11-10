@@ -107,11 +107,11 @@ jobs:
       
       # 2. Build with Docker Compose
       - name: Build with Docker Compose
-        run: docker-compose build
+        run: docker compose build
       
       # 3. Verify services start
       - name: Start services
-        run: docker-compose up -d
+        run: docker compose up -d
       
       # 4. Wait for services to be ready
       - name: Wait for services
@@ -119,9 +119,8 @@ jobs:
       
       # 5. Check services are running
       - name: Check services health
-        run: docker-compose ps
+        run: docker compose ps
       
       # 6. Cleanup
       - name: Stop services
-        run: docker-compose down
-
+        run: docker compose down
