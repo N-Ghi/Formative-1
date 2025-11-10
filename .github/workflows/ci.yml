@@ -45,8 +45,17 @@ jobs:
         run: npm test
         env:
           NODE_ENV: test
+
+      # 6. Set up environment variables
+      - name: Set up environment variables
+        run: |
+          echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" >> backend/.env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> backend/.env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> backend/.env
+          echo "SEED_PASSWORD=${{ secrets.SEED_PASSWORD }}" >> backend/.env
+          echo "PORT=${{ secrets.PORT }}" >> backend/.env
       
-      # 6. Build Docker image
+      # 7. Build Docker image
       - name: Build Backend Docker image
         run: docker build -t inventory-backend:${{ github.sha }} .
         working-directory: ./backend
@@ -85,11 +94,16 @@ jobs:
         env:
           NODE_ENV: test
       
-      # 6. Build application
+      # 6. Set up environment variables
+      - name: Set up environment variables
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> frontend/.env
+      
+      # 7. Build application
       - name: Build application
         run: npm run build
       
-      # 7. Build Docker image
+      # 8. Build Docker image
       - name: Build Frontend Docker image
         run: docker build -t inventory-frontend:${{ github.sha }} .
         working-directory: ./frontend
