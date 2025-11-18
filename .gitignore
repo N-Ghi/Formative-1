@@ -155,3 +155,9 @@ vite.config.ts.timestamp-*
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# Terraform state files
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
