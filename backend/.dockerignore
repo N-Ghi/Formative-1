@@ -6,3 +6,45 @@ node_modules
 .sqlite3
 .db
 database.sqlite
+# Node modules
+node_modules
+npm-debug.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# Testing
+coverage
+.nyc_output
+
+# Documentation
+*.md
+README.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Database (will be persisted via volume)
+*.sqlite
+*.sqlite-journal
+
+# Docker
+dockerfile
+.dockerignore

@@ -1,0 +1,153 @@
+name: CI Pipeline
+
+on:
+  # Trigger on pushes to any branch except main
+  push:
+    branches-ignore:
+      - main
+  
+  # Trigger on pull requests targeting main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Backend CI Job
+  backend-ci:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 2. Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
+      
+      # 4. Run linting (fail on errors)
+      - name: Run linting
+        run: npm run lint
+      
+      # 5. Run tests (fail if tests fail)
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+
+      # 6. Set up environment variables
+      - name: Set up environment variables
+        run: |
+          echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
+          echo "SEED_PASSWORD=${{ secrets.SEED_PASSWORD }}" >> .env
+          echo "PORT=${{ secrets.PORT }}" >> .env
+      
+      # 7. Build Docker image
+      - name: Build Backend Docker image
+        run: docker build -t inventory-backend:${{ github.sha }} .
+        working-directory: ./backend
+
+  # Frontend CI Job
+  frontend-ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend
+    
+    steps:
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 2. Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
+      
+      # 4. Run linting (fail on errors)
+      - name: Run linting
+        run: npm run lint
+      
+      # 5. Run tests (fail if tests fail)
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+      
+      # 6. Set up environment variables
+      - name: Set up environment variables
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+      
+      # 7. Build application
+      - name: Build application
+        run: npm run build
+      
+      # 8. Build Docker image
+      - name: Build Frontend Docker image
+        run: docker build -t inventory-frontend:${{ github.sha }} .
+        working-directory: ./frontend
+
+  # Docker Compose Build Job
+  docker-compose:
+    name: Docker Compose Build
+    runs-on: ubuntu-latest
+    needs: [backend-ci, frontend-ci]
+    
+    steps:
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 2. Build with Docker Compose
+      - name: Build with Docker Compose
+        run: docker compose build
+      
+      # 3. Set up backend .env files
+      - name: Create backend .env
+        run: |
+          echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" > ./backend/.env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> ./backend/.env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> ./backend/.env
+          echo "SEED_PASSWORD=${{ secrets.SEED_PASSWORD }}" >> ./backend/.env
+          echo "PORT=${{ secrets.PORT }}" >> ./backend/.env
+      # 4. Set up frontend .env files
+      - name: Create frontend .env
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > ./frontend/.env
+        
+      # 5. Verify services start
+      - name: Start services
+        run: docker compose up -d
+      
+      # 6. Wait for services to be ready
+      - name: Wait for services
+        run: sleep 10
+      
+      # 7. Check services are running
+      - name: Check services health
+        run: docker compose ps
+      
+      # 8. Cleanup
+      - name: Stop services
+        run: docker compose down

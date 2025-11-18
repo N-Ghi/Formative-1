@@ -1,6 +1,6 @@
-import { Inventory } from '../models/inventoryModel.js';
-import { Product } from '../models/productModel.js';
-import { Op } from 'sequelize';
+import { Inventory } from "../models/inventoryModel.js";
+import { Product } from "../models/productModel.js";
+import { Op } from "sequelize";
 
 /**
  * Get all inventories (with pagination and optional filtering)
@@ -33,8 +33,10 @@ export const getAllInventories = async (req, res) => {
 
         if (restockMin || restockMax) {
             whereClause.restockValue = {};
-            if (restockMin) whereClause.restockValue[Op.gte] = Number(restockMin);
-            if (restockMax) whereClause.restockValue[Op.lte] = Number(restockMax);
+            if (restockMin)
+                whereClause.restockValue[Op.gte] = Number(restockMin);
+            if (restockMax)
+                whereClause.restockValue[Op.lte] = Number(restockMax);
         }
 
         // Query with pagination + filtering + seller scoping
@@ -43,14 +45,14 @@ export const getAllInventories = async (req, res) => {
             include: [
                 {
                     model: Product,
-                    as: 'productDetails',
+                    as: "productDetails",
                     where: { seller: req.user.id },
                 },
             ],
             limit: Number(limit),
             offset: Number(offset),
             distinct: true,
-            order: [['createdAt', 'DESC']],
+            order: [["createdAt", "DESC"]],
         });
 
         res.status(200).json({
@@ -60,14 +62,13 @@ export const getAllInventories = async (req, res) => {
             offset: Number(offset),
         });
     } catch (error) {
-        console.error('Error fetching inventories:', error);
+        console.error("Error fetching inventories:", error);
         res.status(500).json({
-            message: 'Failed to fetch inventories',
+            message: "Failed to fetch inventories",
             error: error.message,
         });
     }
 };
-
 
 /**
  * Get a single inventory record by ID
@@ -76,13 +77,14 @@ export const getInventoryById = async (req, res) => {
     try {
         const { id } = req.params;
         const inventory = await Inventory.findByPk(id, {
-        include: [{ model: Product, as: 'productDetails' }],
+            include: [{ model: Product, as: "productDetails" }],
         });
-        if (!inventory) return res.status(404).json({ message: 'Inventory not found' });
+        if (!inventory)
+            return res.status(404).json({ message: "Inventory not found" });
         res.status(200).json(inventory);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to fetch inventory', error });
+        res.status(500).json({ message: "Failed to fetch inventory", error });
     }
 };
 
@@ -95,13 +97,18 @@ export const createInventory = async (req, res) => {
 
         // Ensure product exists
         const product = await Product.findByPk(productId);
-        if (!product) return res.status(400).json({ message: 'Invalid productId' });
+        if (!product)
+            return res.status(400).json({ message: "Invalid productId" });
 
-        const inventory = await Inventory.create({ productId, quantity, restockValue });
+        const inventory = await Inventory.create({
+            productId,
+            quantity,
+            restockValue,
+        });
         res.status(201).json(inventory);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to create inventory', error });
+        res.status(500).json({ message: "Failed to create inventory", error });
     }
 };
 
@@ -114,7 +121,8 @@ export const updateInventory = async (req, res) => {
         const { quantity, restockValue } = req.body;
 
         const inventory = await Inventory.findByPk(id);
-        if (!inventory) return res.status(404).json({ message: 'Inventory not found' });
+        if (!inventory)
+            return res.status(404).json({ message: "Inventory not found" });
 
         if (quantity !== undefined) inventory.quantity = quantity;
         if (restockValue !== undefined) inventory.restockValue = restockValue;
@@ -123,10 +131,9 @@ export const updateInventory = async (req, res) => {
         res.status(200).json(inventory);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to update inventory', error });
+        res.status(500).json({ message: "Failed to update inventory", error });
     }
 };
-
 
 /**
  * Delete an inventory record by ID
@@ -135,12 +142,13 @@ export const deleteInventory = async (req, res) => {
     try {
         const { id } = req.params;
         const inventory = await Inventory.findByPk(id);
-        if (!inventory) return res.status(404).json({ message: 'Inventory not found' });
+        if (!inventory)
+            return res.status(404).json({ message: "Inventory not found" });
 
         await inventory.destroy();
-        res.status(200).json({ message: 'Inventory deleted successfully' });
+        res.status(200).json({ message: "Inventory deleted successfully" });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to delete inventory', error });
+        res.status(500).json({ message: "Failed to delete inventory", error });
     }
 };
