@@ -48,7 +48,7 @@ module "bastion" {
   public_subnet_id    = module.vnet.public_subnet_id
   bastion_vm_name     = "bastion-vm"
   admin_username      = "azureuser"
-  admin_password      = var.vm_admin_password   # sensitive variable from Terraform Cloud
+  admin_password      = var.vm_admin_password # sensitive variable from Terraform Cloud
 }
 
 # 3 Private VM
@@ -59,7 +59,7 @@ module "private_vm" {
   private_subnet_id   = module.vnet.private_subnet_id
   vm_name             = "app-vm"
   admin_username      = "azureuser"
-  vm_admin_password      = var.vm_admin_password   # sensitive variable
+  vm_admin_password   = var.vm_admin_password # sensitive variable
   allowed_ssh_cidr    = module.vnet.public_subnet_cidr
 }
 
@@ -69,10 +69,10 @@ module "db" {
   resource_group_name = azurerm_resource_group.summative_rg.name
   location            = azurerm_resource_group.summative_rg.location
   vnet_id             = module.vnet.vnet_id
-  vnet_name           = module.vnet.vnet_name 
+  vnet_name           = module.vnet.vnet_name
   db_name             = "summativedb"
   admin_username      = "dbadmin"
-  db_admin_password   = var.db_admin_password   # sensitive variable
+  db_admin_password   = var.db_admin_password # sensitive variable
 }
 
 # 5 Container Registry

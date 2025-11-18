@@ -29,8 +29,8 @@ resource "azurerm_network_interface" "private_vm_nic" {
 }
 
 resource "azurerm_network_interface_security_group_association" "private_vm_nic_nsg_assoc" {
-  network_interface_id       = azurerm_network_interface.private_vm_nic.id
-  network_security_group_id  = azurerm_network_security_group.private_vm_nsg.id
+  network_interface_id      = azurerm_network_interface.private_vm_nic.id
+  network_security_group_id = azurerm_network_security_group.private_vm_nsg.id
 }
 
 resource "azurerm_linux_virtual_machine" "private_vm" {
