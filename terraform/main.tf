@@ -49,6 +49,7 @@ module "bastion" {
   bastion_vm_name     = "bastion-vm"
   admin_username      = "azureuser"
   admin_password      = var.vm_admin_password # sensitive variable from Terraform Cloud
+  private_vm_nsg_id   = module.private_vm.private_vm_nsg_id
 }
 
 # 3 Private VM

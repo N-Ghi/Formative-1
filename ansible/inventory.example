@@ -1,0 +1,5 @@
+[bastion]
+<bastion_public_ip> ansible_user=<bastion_username> ansible_password=<bastion_password>
+
+[app]
+<app_private_ip> ansible_user=<app_username> ansible_password=<app_password> ansible_ssh_common_args='-o ProxyJump=<bastion_username>@<bastion_public_ip>'

@@ -10,7 +10,8 @@ resource "azurerm_network_security_group" "private_vm_nsg" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = var.allowed_ssh_cidr
+    # source_address_prefix      = var.allowed_ssh_cidr
+    source_address_prefix      = "*" # Allow any source for testing purposes
     destination_port_range     = 22
     destination_address_prefix = "*"
   }

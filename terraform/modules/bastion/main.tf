@@ -42,3 +42,8 @@ resource "azurerm_linux_virtual_machine" "bastion_vm" {
     version   = "latest"
   }
 }
+
+resource "azurerm_network_interface_security_group_association" "private_vm_nic_nsg_assoc" {
+  network_interface_id      = azurerm_network_interface.bastion_nic.id
+  network_security_group_id = var.private_vm_nsg_id
+}

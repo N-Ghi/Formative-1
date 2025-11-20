@@ -161,3 +161,7 @@ vite.config.ts.timestamp-*
 *.tfstate.backup
 .terraform/
 .terraform.lock.hcl
+
+# Ansible files
+*inventory
+!*inventory.example

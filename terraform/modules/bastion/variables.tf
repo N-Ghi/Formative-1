@@ -27,3 +27,8 @@ variable "location" {
   type        = string
   description = "Azure region for the Bastion VM"
 }
+
+variable "private_vm_nsg_id" {
+  type        = string
+  description = "Network Security Group ID of the private VM to allow SSH access from Bastion"
+}
