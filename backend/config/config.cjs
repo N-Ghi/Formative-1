@@ -32,6 +32,7 @@ module.exports = {
             },
         },
         logging: false,
+        storage: "test-db",
     },
     production: {
         username: process.env.AZURE_DB_USER,
