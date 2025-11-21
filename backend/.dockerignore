@@ -1,3 +1,11 @@
+.env
+node_modules
+
+# SQLite database files
+.sqlite
+.sqlite3
+.db
+database.sqlite
 # Node modules
 node_modules
 npm-debug.log

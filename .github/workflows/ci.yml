@@ -40,13 +40,20 @@ jobs:
       - name: Run linting
         run: npm run lint
       
-      # 5. Run tests (fail if tests fail)
+      # 5. Run tests (with environment variables)
       - name: Run tests
         run: npm test
         env:
           NODE_ENV: test
+          AZURE_DB_USER: ${{ secrets.AZURE_DB_USER }}
+          AZURE_DB_PASSWORD: ${{ secrets.AZURE_DB_PASSWORD }}
+          AZURE_DB_NAME: ${{ secrets.AZURE_DB_NAME }}
+          AZURE_DB_HOST: ${{ secrets.AZURE_DB_HOST }}
+          AZURE_DB_PORT: ${{ secrets.AZURE_DB_PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
 
-      # 6. Set up environment variables
+      # 6. Set up environment variables for Docker build
       - name: Set up environment variables
         run: |
           echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" >> .env
@@ -54,6 +61,11 @@ jobs:
           echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
           echo "SEED_PASSWORD=${{ secrets.SEED_PASSWORD }}" >> .env
           echo "PORT=${{ secrets.PORT }}" >> .env
+          echo "AZURE_DB_HOST=${{ secrets.AZURE_DB_HOST }}" >> .env
+          echo "AZURE_DB_PORT=${{ secrets.AZURE_DB_PORT }}" >> .env
+          echo "AZURE_DB_NAME=${{ secrets.AZURE_DB_NAME }}" >> .env
+          echo "AZURE_DB_USER=${{ secrets.AZURE_DB_USER }}" >> .env
+          echo "AZURE_DB_PASSWORD=${{ secrets.AZURE_DB_PASSWORD }}" >> .env
       
       # 7. Build Docker image
       - name: Build Backend Docker image

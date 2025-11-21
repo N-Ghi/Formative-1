@@ -151,12 +151,20 @@ vite.config.ts.timestamp-*
 *.sln
 *.sw?
 
-# Database files
-*.sqlite
-*.sqlite3
-*.db
-
 # Mac system files
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# Terraform state files
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Ansible files
+*inventory
+!*inventory.example
+
+# Certs
+certs/*.crt

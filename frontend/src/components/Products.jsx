@@ -248,23 +248,38 @@ const Products = () => {
               </div>
               <div>
                 <label>Category *</label>
-                <input
-                  type="text"
+                <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   required
-                  style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}
-                />
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.5rem', 
+                    marginTop: '0.25rem',
+                    borderRadius: '4px',
+                    border: '1px solid #ced4da',
+                    fontSize: '1rem'
+                  }}
+                >
+                  <option value="">-- Select a category --</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Books">Books</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Home">Home</option>
+                  <option value="Sports">Sports</option>
+                </select>
               </div>
               <div>
                 <label>Price *</label>
                 <input
                   type="number"
                   step="0.01"
+                  min="100"  // Add minimum value
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
                   style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}
+                  placeholder="Minimum $100.00"
                 />
               </div>
             </div>

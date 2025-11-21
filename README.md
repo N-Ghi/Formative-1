@@ -1,4 +1,5 @@
 # Inventory Management System
+
 > A comprehensive full-stack web application for efficient inventory tracking, stock management, and automated low-stock alerts
 
 ## African Context
@@ -581,6 +582,7 @@ Formative-1/
 │   ├── migrations/                # Database migrations
 │   ├── seeders/                   # Sample data seeders
 │   ├── utils/                     # Utility functions
+│   ├── .env.example               # Environment template
 │   ├── .dockerignore              # Docker ignore file
 │   ├── dockerfile                 # Backend Docker config
 │   ├── app.js                     # Express app entry
@@ -606,6 +608,7 @@ Formative-1/
 │   │   ├── App.jsx                # Main app component
 │   │   ├── main.jsx               # Entry point
 │   │   └── App.css                # Global styles
+│   ├── .env.example
 │   ├── .dockerignore              # Docker ignore file
 │   ├── dockerfile                 # Frontend Docker config
 │   ├── .gitignore                 # NPM default

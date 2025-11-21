@@ -30,17 +30,38 @@ describe("Configuration", () => {
 });
 
 describe("Database Configuration", () => {
-    test("should use SQLite dialect", async () => {
-        // Import config dynamically to avoid module issues
-        const config = await import("../config/config.js");
-        expect(config.default).toBeDefined();
-        expect(config.default.test.dialect).toBe("sqlite");
+    test("should use Postgres dialect", async () => {
+        const config = await import("../config/config.cjs");
+        expect(config.default.test).toBeDefined();
+        expect(config.default.test.dialect).toBe("postgres");
     });
 
     test("should have test database storage defined", async () => {
-        const config = await import("../config/config.js");
+        const config = await import("../config/config.cjs");
         expect(config.default.test.storage).toBeDefined();
-        expect(config.default.test.storage).toContain("test");
+        expect(config.default.test.storage).toBe("test-db");
+    });
+
+    test("should have required database credentials from environment", async () => {
+        const config = await import("../config/config.cjs");
+        expect(config.default.test.username).toBeDefined();
+        expect(config.default.test.password).toBeDefined();
+        expect(config.default.test.database).toBeDefined();
+        expect(config.default.test.host).toBeDefined();
+    });
+
+    test("should have SSL configuration for test environment", async () => {
+        const config = await import("../config/config.cjs");
+        expect(config.default.test.dialectOptions).toBeDefined();
+        expect(config.default.test.dialectOptions.ssl).toBeDefined();
+        expect(config.default.test.dialectOptions.ssl.rejectUnauthorized).toBe(
+            false,
+        );
+    });
+
+    test("should have logging disabled for test environment", async () => {
+        const config = await import("../config/config.cjs");
+        expect(config.default.test.logging).toBe(false);
     });
 });
 
