@@ -30,36 +30,38 @@ describe("Configuration", () => {
 });
 
 describe("Database Configuration", () => {
-    test("should use Postgres dialect", () => {
-        const config = require("../config/config.cjs");
-        expect(config.test).toBeDefined();
-        expect(config.test.dialect).toBe("postgres");
+    test("should use Postgres dialect", async () => {
+        const config = await import("../config/config.cjs");
+        expect(config.default.test).toBeDefined();
+        expect(config.default.test.dialect).toBe("postgres");
     });
 
-    test("should have test database storage defined", () => {
-        const config = require("../config/config.cjs");
-        expect(config.test.storage).toBeDefined();
-        expect(config.test.storage).toBe("test-db");
+    test("should have test database storage defined", async () => {
+        const config = await import("../config/config.cjs");
+        expect(config.default.test.storage).toBeDefined();
+        expect(config.default.test.storage).toBe("test-db");
     });
 
-    test("should have required database credentials from environment", () => {
-        const config = require("../config/config.cjs");
-        expect(config.test.username).toBeDefined();
-        expect(config.test.password).toBeDefined();
-        expect(config.test.database).toBeDefined();
-        expect(config.test.host).toBeDefined();
+    test("should have required database credentials from environment", async () => {
+        const config = await import("../config/config.cjs");
+        expect(config.default.test.username).toBeDefined();
+        expect(config.default.test.password).toBeDefined();
+        expect(config.default.test.database).toBeDefined();
+        expect(config.default.test.host).toBeDefined();
     });
 
-    test("should have SSL configuration for test environment", () => {
-        const config = require("../config/config.cjs");
-        expect(config.test.dialectOptions).toBeDefined();
-        expect(config.test.dialectOptions.ssl).toBeDefined();
-        expect(config.test.dialectOptions.ssl.rejectUnauthorized).toBe(false);
+    test("should have SSL configuration for test environment", async () => {
+        const config = await import("../config/config.cjs");
+        expect(config.default.test.dialectOptions).toBeDefined();
+        expect(config.default.test.dialectOptions.ssl).toBeDefined();
+        expect(config.default.test.dialectOptions.ssl.rejectUnauthorized).toBe(
+            false,
+        );
     });
 
-    test("should have logging disabled for test environment", () => {
-        const config = require("../config/config.cjs");
-        expect(config.test.logging).toBe(false);
+    test("should have logging disabled for test environment", async () => {
+        const config = await import("../config/config.cjs");
+        expect(config.default.test.logging).toBe(false);
     });
 });
 
