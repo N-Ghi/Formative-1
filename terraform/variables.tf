@@ -13,5 +13,5 @@ variable "db_admin_password" {
 variable "my_ip" {
   type        = string
   description = "Your public IP address to allow access to the database"
-  sensitive = false
+  sensitive   = false
 }

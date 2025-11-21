@@ -51,13 +51,13 @@ resource "azurerm_postgresql_flexible_server" "dev_db" {
   sku_name               = "B_Standard_B1ms"
   storage_mb             = 32768
   backup_retention_days  = 7
-  
+
   public_network_access_enabled = true
 }
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_my_ip" {
-  name                = "allow-my-ip"
-  server_id           = azurerm_postgresql_flexible_server.dev_db.id
-  start_ip_address    = var.my_ip
-  end_ip_address      = var.my_ip
+  name             = "allow-my-ip"
+  server_id        = azurerm_postgresql_flexible_server.dev_db.id
+  start_ip_address = var.my_ip
+  end_ip_address   = var.my_ip
 }
