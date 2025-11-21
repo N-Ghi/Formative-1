@@ -4,6 +4,16 @@ require("dotenv").config();
 
 const caCertPath = path.join(__dirname, "../../certs/DigiCertGlobalRootCA.crt");
 
+// Only read the cert if it exists (for production)
+let caCert;
+try {
+    if (fs.existsSync(caCertPath)) {
+        caCert = fs.readFileSync(caCertPath).toString();
+    }
+} catch (err) {
+    console.warn("Certificate file not found, SSL will use default settings");
+}
+
 module.exports = {
     development: {
         username: process.env.AZURE_DB_USER,
@@ -43,8 +53,8 @@ module.exports = {
         dialect: "postgres",
         dialectOptions: {
             ssl: {
-                rejectUnauthorized: true, // local dev
-                ca: fs.readFileSync(caCertPath).toString(),
+                rejectUnauthorized: true,
+                ...(caCert && { ca: caCert }),
             },
         },
         logging: false,
