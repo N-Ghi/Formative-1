@@ -32,13 +32,13 @@ describe("Configuration", () => {
 describe("Database Configuration", () => {
     test("should use Postgres dialect", async () => {
         // Import config dynamically to avoid module issues
-        const config = await import("../config/config.cjs");
+        const config = await require("../config/config.cjs");
         expect(config.default).toBeDefined();
         expect(config.default.test.dialect).toBe("postgres");
     });
 
     test("should have test database storage defined", async () => {
-        const config = await import("../config/config.cjs");
+        const config = await require("../config/config.cjs");
         expect(config.default.test.storage).toBeDefined();
         expect(config.default.test.storage).toContain("test");
     });
