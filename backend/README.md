@@ -28,7 +28,11 @@ npm install
 This project includes seeders under `backend/seeders`. If you use `sequelize-cli` you can run seeders like:
 
 ```bash
-npx sequelize-cli db:seed:all --config path/to/your/config
+# Migrate to Azure
+npx sequelize db:migrate --config ./config/config.cjs --env development
+
+# Seed to Azure
+npx sequelize db:seed:all --config ./config/config.cjs --env development
 ```
 
 (Adjust the command to match your sequelize-cli configuration if necessary.)

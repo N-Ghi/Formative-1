@@ -74,6 +74,7 @@ module "db" {
   db_name             = "summativedb"
   admin_username      = "dbadmin"
   db_admin_password   = var.db_admin_password # sensitive variable
+  my_ip               = var.my_ip
 }
 
 # 5 Container Registry

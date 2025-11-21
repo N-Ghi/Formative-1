@@ -1,4 +1,5 @@
 # Inventory Management System
+
 > A comprehensive full-stack web application for efficient inventory tracking, stock management, and automated low-stock alerts
 
 ## African Context

@@ -165,3 +165,6 @@ vite.config.ts.timestamp-*
 # Ansible files
 *inventory
 !*inventory.example
+
+# Certs
+certs/*.crt

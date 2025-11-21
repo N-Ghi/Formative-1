@@ -33,3 +33,8 @@ variable "vnet_name" {
   description = "Name of the virtual network"
   type        = string
 }
+
+variable "my_ip" {
+  description = "IP address to allow access to the database"
+  type        = string
+}
