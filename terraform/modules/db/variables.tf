@@ -38,3 +38,8 @@ variable "my_ip" {
   description = "IP address to allow access to the database"
   type        = string
 }
+
+variable "palvis" {
+  description = "IP address to allow access to the database"
+  type        = string
+}
