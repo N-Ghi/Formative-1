@@ -44,3 +44,13 @@ variable "private_dns_zone_name" {
   description = "Private DNS zone used for the PostgreSQL private endpoint"
   default     = "privatelink.postgres.database.azure.com"
 }
+
+variable "my_ip" {
+  type        = string
+  description = "Your public IP address to allow access to the database"
+}
+
+variable "palvis" {
+  type        = string
+  description = "A custom variable for demonstration purposes"
+}

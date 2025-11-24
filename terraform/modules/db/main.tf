@@ -54,3 +54,25 @@ resource "azurerm_postgresql_flexible_server" "dev_db" {
   public_network_access_enabled = true
 }
 
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
+  name             = "allow-azure-services"
+  server_id        = azurerm_postgresql_flexible_server.dev_db.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
+}
+
+# Allow your the team member's IP address
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_Ghislaine" {
+  name             = "allow-Ghislaine"
+  server_id        = azurerm_postgresql_flexible_server.dev_db.id
+  start_ip_address = var.my_ip
+  end_ip_address   = var.my_ip
+}
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_Palvis" {
+  name             = "allow-Palvis"
+  server_id        = azurerm_postgresql_flexible_server.dev_db.id
+  start_ip_address = var.palvis
+  end_ip_address   = var.palvis
+}

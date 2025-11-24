@@ -1,18 +1,18 @@
+# Network Interface for Bastion VM with Public IP
 resource "azurerm_network_interface" "bastion_nic" {
   name                = "${var.bastion_vm_name}-nic"
   location            = var.location
   resource_group_name = var.resource_group_name
+
   ip_configuration {
     name                          = "internal"
     subnet_id                     = var.public_subnet_id
     private_ip_address_allocation = "Dynamic"
-    # Removed public_ip_address_id to avoid public IP on NIC (CKV_AZURE_119)
-    # If public access is needed, use Azure Bastion service or NAT Gateway instead
-    # public_ip_address_id = azurerm_public_ip.bastion_public_ip.id
+    public_ip_address_id          = azurerm_public_ip.bastion_public_ip.id
   }
 }
 
-# Public IP resource kept but not attached to NIC (for potential future use with NAT Gateway)
+# Public IP for Bastion VM
 resource "azurerm_public_ip" "bastion_public_ip" {
   name                = "${var.bastion_vm_name}-pip"
   location            = var.location
@@ -21,16 +21,16 @@ resource "azurerm_public_ip" "bastion_public_ip" {
   sku                 = "Standard"
 }
 
+# Bastion Linux VM (Jump Box)
 resource "azurerm_linux_virtual_machine" "bastion_vm" {
   name                            = var.bastion_vm_name
   resource_group_name             = var.resource_group_name
   location                        = var.location
   size                            = "Standard_B1s"
   admin_username                  = var.admin_username
-  disable_password_authentication = true # Require SSH keys (CKV_AZURE_149, CKV_AZURE_1, CKV_AZURE_178)
+  disable_password_authentication = true
 
-  # Use SSH key authentication instead of password
-  # Support multiple SSH keys (one per line)
+  # SSH key authentication only
   dynamic "admin_ssh_key" {
     for_each = [for key in split("\n", trimspace(var.ssh_public_key)) : key if trimspace(key) != ""]
     content {
@@ -56,7 +56,8 @@ resource "azurerm_linux_virtual_machine" "bastion_vm" {
   }
 }
 
-resource "azurerm_network_interface_security_group_association" "private_vm_nic_nsg_assoc" {
+# Associate Bastion NIC with Public NSG
+resource "azurerm_network_interface_security_group_association" "bastion_nic_nsg_assoc" {
   network_interface_id      = azurerm_network_interface.bastion_nic.id
-  network_security_group_id = var.private_vm_nsg_id
+  network_security_group_id = var.public_nsg_id
 }

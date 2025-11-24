@@ -41,7 +41,6 @@ resource "azurerm_linux_virtual_machine" "private_vm" {
   admin_username                  = var.admin_username
   disable_password_authentication = true # Require SSH keys (CKV_AZURE_149, CKV_AZURE_1, CKV_AZURE_178)
 
-  # Use SSH key authentication instead of password
   # Support multiple SSH keys (one per line)
   dynamic "admin_ssh_key" {
     for_each = [for key in split("\n", trimspace(var.ssh_public_key)) : key if trimspace(key) != ""]

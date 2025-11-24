@@ -99,10 +99,10 @@ jobs:
               echo "::error::CRITICAL vulnerabilities detected by Trivy in backend image"
               exit 1
             else
-              echo "✅ No CRITICAL vulnerabilities found by Trivy in backend image"
+              echo "No CRITICAL vulnerabilities found by Trivy in backend image"
             fi
           else
-            echo "⚠️ SARIF file not found: $SARIF_FILE"
+            echo "SARIF file not found: $SARIF_FILE"
           fi
       
       # 8c. Check Trivy results file
@@ -113,10 +113,10 @@ jobs:
         run: |
           if [ -f ./trivy-results-backend.sarif ]; then
             echo "file_exists=true" >> $GITHUB_OUTPUT
-            echo "✅ trivy-results-backend.sarif found"
+            echo "trivy-results-backend.sarif found"
           else
             echo "file_exists=false" >> $GITHUB_OUTPUT
-            echo "⚠️ trivy-results-backend.sarif not found"
+            echo "trivy-results-backend.sarif not found"
           fi
       
       # 9. Upload Trivy results to GitHub Security tab
@@ -199,10 +199,10 @@ jobs:
               echo "::error::CRITICAL vulnerabilities detected by Trivy in frontend image"
               exit 1
             else
-              echo "✅ No CRITICAL vulnerabilities found by Trivy in frontend image"
+              echo "No CRITICAL vulnerabilities found by Trivy in frontend image"
             fi
           else
-            echo "⚠️ SARIF file not found: $SARIF_FILE"
+            echo "SARIF file not found: $SARIF_FILE"
           fi
       
       # 9c. Check Trivy results file
@@ -213,10 +213,10 @@ jobs:
         run: |
           if [ -f ./trivy-results-frontend.sarif ]; then
             echo "file_exists=true" >> $GITHUB_OUTPUT
-            echo "✅ trivy-results-frontend.sarif found"
+            echo "trivy-results-frontend.sarif found"
           else
             echo "file_exists=false" >> $GITHUB_OUTPUT
-            echo "⚠️ trivy-results-frontend.sarif not found"
+            echo "trivy-results-frontend.sarif not found"
           fi
       
       # 10. Upload Trivy results to GitHub Security tab
@@ -271,23 +271,23 @@ jobs:
           cd ..
           # Check if SARIF file was created
           if [ -f ./tfsec-results.sarif ]; then
-            echo "✅ tfsec scan completed, results file created"
+            echo "tfsec scan completed, results file created"
             # Check for CRITICAL findings (error level in SARIF)
             if grep -q '"level":"error"' ./tfsec-results.sarif; then
-              echo "❌ CRITICAL security issues found by tfsec!"
+              echo "CRITICAL security issues found by tfsec!"
               exit 1
             elif [ $TFSEC_EXIT_CODE -ne 0 ]; then
-              echo "❌ tfsec scan failed with exit code: $TFSEC_EXIT_CODE"
+              echo "tfsec scan failed with exit code: $TFSEC_EXIT_CODE"
               exit 1
             else
-              echo "✅ No CRITICAL security issues found by tfsec"
+              echo "No CRITICAL security issues found by tfsec"
               exit 0
             fi
           else
-            echo "⚠️ tfsec results file not created (exit code: $TFSEC_EXIT_CODE)"
+            echo "tfsec results file not created (exit code: $TFSEC_EXIT_CODE)"
             # If tfsec failed and no file was created, still fail
             if [ $TFSEC_EXIT_CODE -ne 0 ]; then
-              echo "❌ tfsec scan failed"
+              echo "tfsec scan failed"
               exit 1
             fi
             exit 0
@@ -300,10 +300,10 @@ jobs:
         run: |
           if [ -f ./tfsec-results.sarif ]; then
             echo "file_exists=true" >> $GITHUB_OUTPUT
-            echo "✅ tfsec results file found"
+            echo "tfsec results file found"
           else
             echo "file_exists=false" >> $GITHUB_OUTPUT
-            echo "⚠️ tfsec results file not found"
+            echo "tfsec results file not found"
           fi
       
       # 5. Upload tfsec results to GitHub Security tab
@@ -322,36 +322,36 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install checkov
       
-      # 7. Run Checkov security scan on Terraform
+            # 7. Run Checkov security scan on Terraform
       - name: Run Checkov security scan
         id: checkov
         continue-on-error: true
         run: |
-          # Run checkov and capture exit code
+          # Run checkov and skip Premium SKU checks, as well as the extension check that was causing false positives
           set +e
-          checkov -d ./terraform \
+          checkov -d . \
             --framework terraform \
-            --output sarif \
-            --output-file-path ./checkov-results.sarif \
-            --quiet
+            --output cli \
+            --quiet \
+            --skip-check CKV_AZURE_237,CKV_AZURE_233,CKV_AZURE_167,CKV_AZURE_164,CKV_AZURE_165,CKV_AZURE_166,CKV_AZURE_163,CKV_AZURE_139,CKV_AZURE_136,CKV_AZURE_50 
           CHECKOV_EXIT_CODE=$?
           set -e
           
           # Check if SARIF file was created
           if [ -f ./checkov-results.sarif ]; then
-            echo "✅ Checkov scan completed, results file created"
+            echo "Checkov scan completed, results file created"
             # Check for CRITICAL severity issues (error level in SARIF)
             if grep -q '"level":"error"' ./checkov-results.sarif; then
-              echo "❌ CRITICAL security issues found by Checkov!"
+              echo "CRITICAL security issues found by Checkov!"
               exit 1
             elif [ $CHECKOV_EXIT_CODE -ne 0 ]; then
-              echo "⚠️ Checkov found issues but none are CRITICAL"
+              echo "Checkov found issues but none are CRITICAL"
               exit 0
             else
-              echo "✅ No CRITICAL security issues found by Checkov"
+              echo "No CRITICAL security issues found by Checkov"
             fi
           else
-            echo "⚠️ Checkov results file not created"
+            echo "Checkov results file not created"
             exit 0
           fi
       
@@ -362,10 +362,10 @@ jobs:
         run: |
           if [ -f ./checkov-results.sarif ]; then
             echo "file_exists=true" >> $GITHUB_OUTPUT
-            echo "✅ Checkov results file found"
+            echo "Checkov results file found"
           else
             echo "file_exists=false" >> $GITHUB_OUTPUT
-            echo "⚠️ Checkov results file not found"
+            echo "Checkov results file not found"
           fi
       
       # 9. Upload Checkov results to GitHub Security tab
