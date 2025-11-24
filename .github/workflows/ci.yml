@@ -80,7 +80,7 @@ jobs:
       # 8. Scan Docker image for vulnerabilities with Trivy
       - name: Run Trivy vulnerability scanner on Backend image
         id: trivy_backend
-        uses: aquasecurity/trivy-action@v1
+        uses: aquasecurity/trivy-action@0.33.1
         continue-on-error: true
         with:
           image-ref: 'inventory-backend:${{ github.sha }}'
@@ -166,7 +166,7 @@ jobs:
       # 9. Scan Docker image for vulnerabilities with Trivy
       - name: Run Trivy vulnerability scanner on Frontend image
         id: trivy_frontend
-        uses: aquasecurity/trivy-action@v1
+        uses: aquasecurity/trivy-action@0.33.1
         continue-on-error: true
         with:
           image-ref: 'inventory-frontend:${{ github.sha }}'
