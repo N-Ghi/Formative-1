@@ -105,10 +105,24 @@ jobs:
             echo "⚠️ SARIF file not found: $SARIF_FILE"
           fi
       
+      # 8c. Check Trivy results file
+      - name: Check Trivy results file
+        id: check_trivy_file_backend
+        continue-on-error: true
+        if: always()
+        run: |
+          if [ -f ./trivy-results-backend.sarif ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "✅ trivy-results-backend.sarif found"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ trivy-results-backend.sarif not found"
+          fi
+      
       # 9. Upload Trivy results to GitHub Security tab
       - name: Upload Trivy scan results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && steps.check_trivy_file_backend.outputs.file_exists == 'true'
         with:
           sarif_file: 'trivy-results-backend.sarif'
           category: 'backend-container-scan'
@@ -191,10 +205,24 @@ jobs:
             echo "⚠️ SARIF file not found: $SARIF_FILE"
           fi
       
+      # 9c. Check Trivy results file
+      - name: Check Trivy results file
+        id: check_trivy_file_frontend
+        continue-on-error: true
+        if: always()
+        run: |
+          if [ -f ./trivy-results-frontend.sarif ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "✅ trivy-results-frontend.sarif found"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ trivy-results-frontend.sarif not found"
+          fi
+      
       # 10. Upload Trivy results to GitHub Security tab
       - name: Upload Trivy scan results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && steps.check_trivy_file_frontend.outputs.file_exists == 'true'
         with:
           sarif_file: 'trivy-results-frontend.sarif'
           category: 'frontend-container-scan'
