@@ -1,15 +1,15 @@
 output "db_id" {
-  value       = azurerm_postgresql_flexible_server.db.id
+  value       = azurerm_postgresql_flexible_server.dev_db.id
   description = "The ID of the managed PostgreSQL server"
 }
 
 output "db_fqdn" {
-  value       = azurerm_postgresql_flexible_server.db.fqdn
+  value       = azurerm_postgresql_flexible_server.dev_db.fqdn
   description = "The fully qualified domain name of the database"
 }
 
 output "db_admin_username" {
-  value       = azurerm_postgresql_flexible_server.db.administrator_login
+  value       = azurerm_postgresql_flexible_server.dev_db.administrator_login
   description = "The admin username for the database"
 }
 

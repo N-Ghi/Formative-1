@@ -22,12 +22,12 @@ resource "azurerm_public_ip" "bastion_public_ip" {
 }
 
 resource "azurerm_linux_virtual_machine" "bastion_vm" {
-  name                = var.bastion_vm_name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  size                = "Standard_B1s"
-  admin_username      = var.admin_username
-  disable_password_authentication = true  # Require SSH keys (CKV_AZURE_149, CKV_AZURE_1, CKV_AZURE_178)
+  name                            = var.bastion_vm_name
+  resource_group_name             = var.resource_group_name
+  location                        = var.location
+  size                            = "Standard_B1s"
+  admin_username                  = var.admin_username
+  disable_password_authentication = true # Require SSH keys (CKV_AZURE_149, CKV_AZURE_1, CKV_AZURE_178)
 
   # Use SSH key authentication instead of password
   # Support multiple SSH keys (one per line)

@@ -27,10 +27,10 @@ resource "azurerm_network_security_group" "public_nsg" {
 
   # Allow HTTP/HTTPS for web services
   security_rule {
-    name                       = "Allow-HTTP"
+    name                       = "Deny-HTTP"
     priority                   = 100
     direction                  = "Inbound"
-    access                     = "Allow"
+    access                     = "Deny"
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = 80
@@ -65,7 +65,7 @@ resource "azurerm_network_security_group" "private_nsg" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = var.public_subnet_cidr  # Restrict to bastion subnet
+    source_address_prefix      = var.public_subnet_cidr # Restrict to bastion subnet
     destination_port_range     = 22
     destination_address_prefix = "*"
   }

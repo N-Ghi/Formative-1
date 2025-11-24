@@ -38,7 +38,7 @@ module "vnet" {
   vnet_cidr           = "10.0.0.0/16"
   public_subnet_cidr  = "10.0.1.0/24"
   private_subnet_cidr = "10.0.2.0/24"
-  allowed_ssh_cidr    = "10.0.1.0/24"  # Allow SSH from bastion subnet
+  allowed_ssh_cidr    = "10.0.1.0/24" # Allow SSH from bastion subnet
 }
 
 # 2 Bastion host
@@ -69,17 +69,21 @@ module "private_vm" {
 
 # 4 Managed DB
 module "db" {
-  source              = "./modules/db"
-  resource_group_name = azurerm_resource_group.summative_rg.name
-  location            = azurerm_resource_group.summative_rg.location
-  vnet_id             = module.vnet.vnet_id
-  vnet_name           = module.vnet.vnet_name
-  db_name             = "summativedb"
-  admin_username      = "dbadmin"
-  db_admin_password   = var.db_admin_password # sensitive variable
-  my_ip               = var.my_ip
-  palvis              = var.palvis
+  source = "./modules/db"
+
+  resource_group_name      = azurerm_resource_group.summative_rg.name
+  location                 = azurerm_resource_group.summative_rg.location
+  admin_username           = "dbadmin"
+  db_admin_password        = var.db_admin_password
+  vnet_id                  = module.vnet.vnet_id
+  vnet_name                = module.vnet.vnet_name
+  subnet_nsg_name          = "db-subnet-nsg"
+  db_subnet_address_prefix = "10.0.3.0/24"
+  # db_admin_password   = var.db_admin_password # sensitive variable
+  # my_ip               = var.my_ip
+  # palvis              = var.palvis
 }
+
 
 # 5 Container Registry
 module "acr" {

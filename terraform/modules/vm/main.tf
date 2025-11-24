@@ -10,7 +10,7 @@ resource "azurerm_network_security_group" "private_vm_nsg" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = var.allowed_ssh_cidr  # Restrict SSH source (CKV_AZURE_10)
+    source_address_prefix      = var.allowed_ssh_cidr # Restrict SSH source (CKV_AZURE_10)
     destination_port_range     = 22
     destination_address_prefix = "*"
   }
@@ -34,12 +34,12 @@ resource "azurerm_network_interface_security_group_association" "private_vm_nic_
 }
 
 resource "azurerm_linux_virtual_machine" "private_vm" {
-  name                = var.vm_name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  size                = "Standard_B1s"
-  admin_username      = var.admin_username
-  disable_password_authentication = true  # Require SSH keys (CKV_AZURE_149, CKV_AZURE_1, CKV_AZURE_178)
+  name                            = var.vm_name
+  resource_group_name             = var.resource_group_name
+  location                        = var.location
+  size                            = "Standard_B1s"
+  admin_username                  = var.admin_username
+  disable_password_authentication = true # Require SSH keys (CKV_AZURE_149, CKV_AZURE_1, CKV_AZURE_178)
 
   # Use SSH key authentication instead of password
   # Support multiple SSH keys (one per line)
