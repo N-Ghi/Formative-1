@@ -38,6 +38,7 @@ module "vnet" {
   vnet_cidr           = "10.0.0.0/16"
   public_subnet_cidr  = "10.0.1.0/24"
   private_subnet_cidr = "10.0.2.0/24"
+  allowed_ssh_cidr    = "10.0.1.0/24"  # Allow SSH from bastion subnet
 }
 
 # 2 Bastion host
@@ -48,7 +49,8 @@ module "bastion" {
   public_subnet_id    = module.vnet.public_subnet_id
   bastion_vm_name     = "bastion-vm"
   admin_username      = "azureuser"
-  admin_password      = var.vm_admin_password # sensitive variable from Terraform Cloud
+  admin_password      = var.vm_admin_password # sensitive variable from Terraform Cloud (deprecated - use SSH keys)
+  ssh_public_key      = var.ssh_public_key
   private_vm_nsg_id   = module.private_vm.private_vm_nsg_id
 }
 
@@ -60,7 +62,8 @@ module "private_vm" {
   private_subnet_id   = module.vnet.private_subnet_id
   vm_name             = "app-vm"
   admin_username      = "azureuser"
-  vm_admin_password   = var.vm_admin_password # sensitive variable
+  vm_admin_password   = var.vm_admin_password # sensitive variable (deprecated - use SSH keys)
+  ssh_public_key      = var.ssh_public_key
   allowed_ssh_cidr    = module.vnet.public_subnet_cidr
 }
 

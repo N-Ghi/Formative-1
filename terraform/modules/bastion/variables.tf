@@ -32,3 +32,9 @@ variable "private_vm_nsg_id" {
   type        = string
   description = "Network Security Group ID of the private VM to allow SSH access from Bastion"
 }
+
+variable "ssh_public_key" {
+  type        = string
+  description = "SSH public key content for VM authentication. Can contain multiple keys separated by newlines."
+  sensitive   = true
+}

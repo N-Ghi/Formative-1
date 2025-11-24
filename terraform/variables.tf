@@ -21,3 +21,9 @@ variable "palvis" {
   description = "A custom variable for demonstration purposes"
   sensitive   = false
 }
+
+variable "Palvis-ssh" {
+  type        = string
+  description = "SSH public key content for VM authentication. Store in Terraform Cloud as a sensitive variable. Required for SSH key-based auth. Can contain multiple keys separated by newlines."
+  sensitive   = true
+}

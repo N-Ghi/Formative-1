@@ -33,3 +33,9 @@ variable "allowed_ssh_cidr" {
   type        = string
   description = "CIDR block allowed to SSH into the VM, usually the Bastion subnet CIDR"
 }
+
+variable "ssh_public_key" {
+  type        = string
+  description = "SSH public key content for VM authentication. Can contain multiple keys separated by newlines."
+  sensitive   = true
+}

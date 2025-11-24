@@ -22,3 +22,9 @@ variable "location" {
   type        = string
   description = "Azure region for the resources"
 }
+
+variable "allowed_ssh_cidr" {
+  type        = string
+  description = "CIDR block allowed to SSH into VMs (usually bastion subnet CIDR)"
+  default     = ""
+}
