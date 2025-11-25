@@ -2,7 +2,16 @@
 
 ## Overview
 
-This project includes a comprehenvsive Continuous Integration (CI) pipeline that automatically tests and validates code changes before they are merged.
+This project includes a comprehensive Continuous Integration (CI) pipeline with integrated DevSecOps security scanning that automatically tests, validates, and scans code changes before they are merged.
+
+### 🔒 Security-First Approach
+
+The pipeline implements "shift left" security practices, automatically scanning for vulnerabilities early in the development lifecycle:
+
+- **Container Image Scanning**: Trivy scans all Docker images for known vulnerabilities
+- **Infrastructure as Code Scanning**: tfsec and Checkov scan Terraform configurations for security misconfigurations
+- **Fail Fast**: Builds automatically fail if CRITICAL vulnerabilities are detected
+- **GitHub Security Integration**: All scan results are uploaded to GitHub Security tab for visibility
 
 ## Pipeline Triggers
 
@@ -22,13 +31,14 @@ The CI pipeline automatically runs on:
 
 ## Pipeline Structure
 
-The CI pipeline consists of three parallel jobs:
+The CI pipeline consists of four parallel jobs:
 
 ```mermaidflowchart
 CI Pipeline
 ├── Backend CI (runs in parallel)
 ├── Frontend CI (runs in parallel)
-└── Docker Compose (runs after both complete)
+├── IaC Security Scan (runs in parallel)
+└── Docker Compose (runs after all complete)
 ```
 
 ---
@@ -68,6 +78,16 @@ CI Pipeline
    - Builds backend Docker image
    - Tags with commit SHA
    - **Pipeline fails if build fails**
+
+7. **Container Security Scan (Trivy)** 🔒 FAILS ON CRITICAL
+   - Scans Docker image for vulnerabilities using Trivy
+   - Checks for CRITICAL and HIGH severity vulnerabilities
+   - Generates SARIF report for GitHub Security tab
+   - **Pipeline fails if CRITICAL vulnerabilities are detected**
+
+8. **Upload Security Results**
+   - Uploads Trivy scan results to GitHub Security tab
+   - Results visible in Security > Code scanning alerts
 
 ---
 
@@ -110,16 +130,77 @@ CI Pipeline
    - Tags with commit SHA
    - **Pipeline fails if build fails**
 
+8. **Container Security Scan (Trivy)** 🔒 FAILS ON CRITICAL
+   - Scans Docker image for vulnerabilities using Trivy
+   - Checks for CRITICAL and HIGH severity vulnerabilities
+   - Generates SARIF report for GitHub Security tab
+   - **Pipeline fails if CRITICAL vulnerabilities are detected**
+
+9. **Upload Security Results**
+   - Uploads Trivy scan results to GitHub Security tab
+   - Results visible in Security > Code scanning alerts
+
 ---
 
-## Job 3: Docker Compose Build
+## Job 3: Infrastructure as Code Security Scan
+
+**Purpose**: Scans Terraform infrastructure code for security vulnerabilities and misconfigurations
+
+### Prerequisites
+
+- Runs in **parallel** with backend-ci and frontend-ci jobs
+- Scans all Terraform files in the `./terraform` directory
+
+### IaC Security Scan Steps
+
+1. **Checkout Code**
+   - Clones repository
+
+2. **Run tfsec Security Scan** 🔒 FAILS ON CRITICAL
+   - Uses: `aquasecurity/tfsec-action@v1.0.3`
+   - Scans Terraform files for security misconfigurations
+   - Minimum severity: CRITICAL
+   - Generates SARIF report
+   - **Pipeline fails if CRITICAL vulnerabilities are detected**
+
+3. **Upload tfsec Results**
+   - Uploads scan results to GitHub Security tab
+   - Results visible in Security > Code scanning alerts
+
+4. **Install Checkov**
+   - Installs Checkov security scanner via pip
+
+5. **Run Checkov Security Scan** 🔒 FAILS ON CRITICAL
+   - Scans Terraform files with Checkov
+   - Framework: Terraform
+   - Output format: SARIF
+   - **Pipeline fails if CRITICAL vulnerabilities are detected**
+
+6. **Upload Checkov Results**
+   - Uploads scan results to GitHub Security tab
+   - Results visible in Security > Code scanning alerts
+
+### Security Scanners Used
+
+- **tfsec**: Specialized Terraform security scanner
+- **Checkov**: Static analysis tool for infrastructure as code
+- Both tools check for:
+  - Insecure configurations
+  - Exposed secrets
+  - Missing security controls
+  - Compliance violations
+  - Best practice violations
+
+---
+
+## Job 4: Docker Compose Build
 
 **Purpose**: Validates full application stack
 
 ### Prerequisites
 
-- Runs **only after** backend-ci and frontend-ci complete successfully
-- Uses: `needs: [backend-ci, frontend-ci]`
+- Runs **only after** backend-ci, frontend-ci, and iac-security-scan complete successfully
+- Uses: `needs: [backend-ci, frontend-ci, iac-security-scan]`
 
 ### Docker Compose Steps
 
@@ -167,7 +248,12 @@ CI Pipeline
    - Missing dependencies
    - Build configuration issues
 
-4. **Docker Compose Fails**
+4. **Security Scanning Fails** 🔒
+   - **Container Image Scanning**: CRITICAL vulnerabilities found in Docker images
+   - **Infrastructure Scanning**: CRITICAL security misconfigurations in Terraform
+   - Both Trivy (container) and tfsec/Checkov (IaC) will fail the build on CRITICAL issues
+
+5. **Docker Compose Fails**
    - Service startup issues
    - Network configuration problems
    - Volume mounting issues
@@ -440,14 +526,64 @@ describe('Component', () => {
 
 ---
 
+## DevSecOps Security Scanning 🔒
+
+The pipeline includes comprehensive security scanning to "shift left" and catch vulnerabilities early in the development lifecycle.
+
+### Container Image Scanning (Trivy)
+
+- **Tool**: Trivy (Aqua Security)
+- **Target**: Docker images (backend and frontend)
+- **When**: After Docker image build
+- **Severity Levels**: CRITICAL, HIGH
+- **Action on Failure**: Pipeline fails if CRITICAL vulnerabilities detected
+- **Output**: SARIF format, uploaded to GitHub Security tab
+
+### Infrastructure as Code Scanning
+
+- **Tools**: 
+  - **tfsec**: Specialized Terraform security scanner
+  - **Checkov**: Multi-framework IaC security scanner
+- **Target**: All Terraform files in `./terraform` directory
+- **When**: Runs in parallel with other CI jobs
+- **Severity Levels**: CRITICAL
+- **Action on Failure**: Pipeline fails if CRITICAL vulnerabilities detected
+- **Output**: SARIF format, uploaded to GitHub Security tab
+
+### Viewing Security Results
+
+1. Navigate to GitHub repository
+2. Click **Security** tab
+3. Click **Code scanning alerts**
+4. View findings from:
+   - `backend-container-scan` (Trivy)
+   - `frontend-container-scan` (Trivy)
+   - `terraform-security-scan` (tfsec)
+   - `terraform-checkov-scan` (Checkov)
+
+### Security Best Practices
+
+- ✅ All security scans run automatically on every push and PR
+- ✅ Builds fail fast on CRITICAL vulnerabilities
+- ✅ Results are integrated into GitHub Security tab
+- ✅ Security findings are visible to all team members
+- ✅ Historical tracking of security issues
+
 ## CI/CD Pipeline Extensions
+
+### Completed Enhancements
+
+- ✅ Container image security scanning (Trivy)
+- ✅ Infrastructure as Code security scanning (tfsec, Checkov)
+- ✅ Automated vulnerability detection
+- ✅ GitHub Security integration
 
 ### Future Enhancements
 
 - [ ] Add code coverage reporting
 - [ ] Add performance benchmarks
-- [ ] Add security scanning
-- [ ] Add dependency vulnerability checks
+- [ ] Add dependency vulnerability checks (npm audit, Snyk)
+- [ ] Add secret scanning (GitHub Secret Scanning, TruffleHog)
 - [ ] Add automated deployments
 - [ ] Add staging environment tests
 - [ ] Add E2E tests with Playwright

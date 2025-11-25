@@ -4,14 +4,13 @@ resource "azurerm_network_security_group" "private_vm_nsg" {
   resource_group_name = var.resource_group_name
 
   security_rule {
-    name              = "SSH-from-Bastion"
-    priority          = 100
-    direction         = "Inbound"
-    access            = "Allow"
-    protocol          = "Tcp"
-    source_port_range = "*"
-    # source_address_prefix      = var.allowed_ssh_cidr
-    source_address_prefix      = "*" # Allow any source for testing purposes
+    name                       = "SSH-from-Bastion"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    source_address_prefix      = var.allowed_ssh_cidr # Restrict SSH source (CKV_AZURE_10)
     destination_port_range     = 22
     destination_address_prefix = "*"
   }
@@ -35,12 +34,21 @@ resource "azurerm_network_interface_security_group_association" "private_vm_nic_
 }
 
 resource "azurerm_linux_virtual_machine" "private_vm" {
-  name                = var.vm_name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  size                = "Standard_B1s"
-  admin_username      = var.admin_username
-  admin_password      = var.vm_admin_password
+  name                            = var.vm_name
+  resource_group_name             = var.resource_group_name
+  location                        = var.location
+  size                            = "Standard_B1s"
+  admin_username                  = var.admin_username
+  disable_password_authentication = true # Require SSH keys (CKV_AZURE_149, CKV_AZURE_1, CKV_AZURE_178)
+
+  # Support multiple SSH keys (one per line)
+  dynamic "admin_ssh_key" {
+    for_each = [for key in split("\n", trimspace(var.ssh_public_key)) : key if trimspace(key) != ""]
+    content {
+      username   = var.admin_username
+      public_key = trimspace(admin_ssh_key.value)
+    }
+  }
 
   network_interface_ids = [
     azurerm_network_interface.private_vm_nic.id
@@ -57,6 +65,4 @@ resource "azurerm_linux_virtual_machine" "private_vm" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
-
-  disable_password_authentication = false
 }

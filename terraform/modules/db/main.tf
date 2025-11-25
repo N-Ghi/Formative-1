@@ -2,7 +2,8 @@ resource "azurerm_subnet" "db_subnet" {
   name                 = "db-subnet"
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.vnet_name
-  address_prefixes     = ["10.0.3.0/24"]
+  address_prefixes     = [var.db_subnet_address_prefix]
+
   delegation {
     name = "db_delegation"
     service_delegation {
@@ -12,20 +13,15 @@ resource "azurerm_subnet" "db_subnet" {
   }
 }
 
-resource "azurerm_postgresql_flexible_server" "db" {
-  name                          = var.db_name
-  resource_group_name           = var.resource_group_name
-  location                      = var.location
-  version                       = "15"              # PostgreSQL version
-  sku_name                      = "B_Standard_B1ms" # small dev instance
-  storage_mb                    = 32768             # 32 GB
-  administrator_login           = var.admin_username
-  administrator_password        = var.db_admin_password
-  delegated_subnet_id           = azurerm_subnet.db_subnet.id
-  public_network_access_enabled = false
-  private_dns_zone_id           = azurerm_private_dns_zone.postgres.id
-  zone                          = "2"
-  depends_on                    = [azurerm_private_dns_zone_virtual_network_link.postgres]
+resource "azurerm_network_security_group" "db_nsg" {
+  name                = var.subnet_nsg_name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_subnet_network_security_group_association" "db_assoc" {
+  subnet_id                 = azurerm_subnet.db_subnet.id
+  network_security_group_id = azurerm_network_security_group.db_nsg.id
 }
 
 resource "azurerm_private_dns_zone" "postgres" {
@@ -41,23 +37,42 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgres" {
 }
 
 resource "azurerm_postgresql_flexible_server" "dev_db" {
-  name                          = "formative-db"
-  resource_group_name           = var.resource_group_name
-  location                      = var.location
-  version                       = "15"
-  delegated_subnet_id           = null # public access doesn't need a subnet
-  administrator_login           = "dbadmin"
-  administrator_password        = var.db_admin_password
-  sku_name                      = "B_Standard_B1ms"
-  storage_mb                    = 32768
-  backup_retention_days         = 7
-  zone                          = "2"
+  name                = "formative-db"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  version             = "15"
+
+  administrator_login    = var.admin_username
+  administrator_password = var.db_admin_password
+
+  sku_name                     = "B_Standard_B1ms"
+  storage_mb                   = 32768
+  geo_redundant_backup_enabled = false
+  backup_retention_days        = 7
+  zone                         = "2"
+
   public_network_access_enabled = true
 }
 
-resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_my_ip" {
-  name             = "allow-my-ip"
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
+  name             = "allow-azure-services"
+  server_id        = azurerm_postgresql_flexible_server.dev_db.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
+}
+
+# Allow your the team member's IP address
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_Ghislaine" {
+  name             = "allow-Ghislaine"
   server_id        = azurerm_postgresql_flexible_server.dev_db.id
   start_ip_address = var.my_ip
+  end_ip_address   = var.my_ip
+}
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_Palvis" {
+  name             = "allow-Palvis"
+  server_id        = azurerm_postgresql_flexible_server.dev_db.id
+  start_ip_address = var.palvis
   end_ip_address   = var.palvis
 }

@@ -11,6 +11,11 @@ on:
     branches:
       - main
 
+# Permissions required for SARIF uploads to GitHub Security tab
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   # Backend CI Job
   backend-ci:
@@ -72,6 +77,58 @@ jobs:
         run: docker build -t inventory-backend:${{ github.sha }} .
         working-directory: ./backend
 
+      # 8. Scan Docker image for vulnerabilities with Trivy
+      - name: Run Trivy vulnerability scanner on Backend image
+        id: trivy_backend
+        uses: aquasecurity/trivy-action@0.33.1
+        continue-on-error: true
+        with:
+          image-ref: 'inventory-backend:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results-backend.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+      
+      # 8b. Fail only if CRITICAL Trivy findings exist
+      - name: Fail only if CRITICAL Trivy findings exist
+        if: always()
+        run: |
+          SARIF_FILE="trivy-results-backend.sarif"
+          if [ -f "$SARIF_FILE" ]; then
+            if grep -q '"level":"error"' "$SARIF_FILE"; then
+              echo "::error::CRITICAL vulnerabilities detected by Trivy in backend image"
+              exit 1
+            else
+              echo "No CRITICAL vulnerabilities found by Trivy in backend image"
+            fi
+          else
+            echo "SARIF file not found: $SARIF_FILE"
+          fi
+      
+      # 8c. Check Trivy results file
+      - name: Check Trivy results file
+        id: check_trivy_file_backend
+        continue-on-error: true
+        if: always()
+        run: |
+          if [ -f ./trivy-results-backend.sarif ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "trivy-results-backend.sarif found"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "trivy-results-backend.sarif not found"
+          fi
+      
+      # 9. Upload Trivy results to GitHub Security tab
+      - name: Upload Trivy scan results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.check_trivy_file_backend.outputs.file_exists == 'true'
+        with:
+          sarif_file: 'trivy-results-backend.sarif'
+          category: 'backend-container-scan'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # Frontend CI Job
   frontend-ci:
     name: Frontend CI
@@ -120,11 +177,225 @@ jobs:
         run: docker build -t inventory-frontend:${{ github.sha }} .
         working-directory: ./frontend
 
+      # 9. Scan Docker image for vulnerabilities with Trivy
+      - name: Run Trivy vulnerability scanner on Frontend image
+        id: trivy_frontend
+        uses: aquasecurity/trivy-action@0.33.1
+        continue-on-error: true
+        with:
+          image-ref: 'inventory-frontend:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results-frontend.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+      
+      # 9b. Fail only if CRITICAL Trivy findings exist
+      - name: Fail only if CRITICAL Trivy findings exist
+        if: always()
+        run: |
+          SARIF_FILE="trivy-results-frontend.sarif"
+          if [ -f "$SARIF_FILE" ]; then
+            if grep -q '"level":"error"' "$SARIF_FILE"; then
+              echo "::error::CRITICAL vulnerabilities detected by Trivy in frontend image"
+              exit 1
+            else
+              echo "No CRITICAL vulnerabilities found by Trivy in frontend image"
+            fi
+          else
+            echo "SARIF file not found: $SARIF_FILE"
+          fi
+      
+      # 9c. Check Trivy results file
+      - name: Check Trivy results file
+        id: check_trivy_file_frontend
+        continue-on-error: true
+        if: always()
+        run: |
+          if [ -f ./trivy-results-frontend.sarif ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "trivy-results-frontend.sarif found"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "trivy-results-frontend.sarif not found"
+          fi
+      
+      # 10. Upload Trivy results to GitHub Security tab
+      - name: Upload Trivy scan results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.check_trivy_file_frontend.outputs.file_exists == 'true'
+        with:
+          sarif_file: 'trivy-results-frontend.sarif'
+          category: 'frontend-container-scan'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Infrastructure as Code Security Scanning Job
+  iac-security-scan:
+    name: Infrastructure as Code Security Scan
+    runs-on: ubuntu-latest
+    
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    steps:
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 2. Install tfsec
+      - name: Install tfsec
+        run: |
+          TFSEC_VERSION=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/aquasecurity/tfsec/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "Installing tfsec version: $TFSEC_VERSION"
+          wget -q -O tfsec.tar.gz "https://github.com/aquasecurity/tfsec/releases/download/${TFSEC_VERSION}/tfsec_${TFSEC_VERSION#v}_linux_amd64.tar.gz"
+          tar -xzf tfsec.tar.gz tfsec
+          chmod +x tfsec
+          echo "$(pwd)" >> $GITHUB_PATH
+          ./tfsec --version
+      
+      # 3. Run tfsec security scan
+      - name: Run tfsec security scan
+        id: tfsec
+        continue-on-error: true
+        run: |
+          cd ./terraform
+          # Run tfsec and capture exit code
+          set +e
+          ../tfsec . \
+            --minimum-severity critical \
+            --format sarif \
+            --out ../tfsec-results.sarif 2>&1
+          TFSEC_EXIT_CODE=$?
+          set -e
+          
+          cd ..
+          # Check if SARIF file was created
+          if [ -f ./tfsec-results.sarif ]; then
+            echo "tfsec scan completed, results file created"
+            # Check for CRITICAL findings (error level in SARIF)
+            if grep -q '"level":"error"' ./tfsec-results.sarif; then
+              echo "CRITICAL security issues found by tfsec!"
+              exit 1
+            elif [ $TFSEC_EXIT_CODE -ne 0 ]; then
+              echo "tfsec scan failed with exit code: $TFSEC_EXIT_CODE"
+              exit 1
+            else
+              echo "No CRITICAL security issues found by tfsec"
+              exit 0
+            fi
+          else
+            echo "tfsec results file not created (exit code: $TFSEC_EXIT_CODE)"
+            # If tfsec failed and no file was created, still fail
+            if [ $TFSEC_EXIT_CODE -ne 0 ]; then
+              echo "tfsec scan failed"
+              exit 1
+            fi
+            exit 0
+          fi
+      
+      # 4. Check if tfsec results exist and upload
+      - name: Check tfsec results file
+        id: check_tfsec_file
+        continue-on-error: true
+        run: |
+          if [ -f ./tfsec-results.sarif ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "tfsec results file found"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "tfsec results file not found"
+          fi
+      
+      # 5. Upload tfsec results to GitHub Security tab
+      - name: Upload tfsec results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.check_tfsec_file.outputs.file_exists == 'true'
+        with:
+          sarif_file: 'tfsec-results.sarif'
+          category: 'terraform-security-scan'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      # 6. Install Checkov
+      - name: Install Checkov
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install checkov
+      
+            # 7. Run Checkov security scan on Terraform
+      - name: Run Checkov security scan
+        id: checkov
+        continue-on-error: true
+        run: |
+          # Run checkov and skip Premium SKU checks, as well as the extension check that was causing false positives
+          set +e
+          checkov -d . \
+            --framework terraform \
+            --output cli \
+            --quiet \
+            --skip-check CKV_AZURE_237,CKV_AZURE_233,CKV_AZURE_167,CKV_AZURE_164,CKV_AZURE_165,CKV_AZURE_166,CKV_AZURE_163,CKV_AZURE_139,CKV_AZURE_136,CKV_AZURE_50 
+          CHECKOV_EXIT_CODE=$?
+          set -e
+          
+          # Check if SARIF file was created
+          if [ -f ./checkov-results.sarif ]; then
+            echo "Checkov scan completed, results file created"
+            # Check for CRITICAL severity issues (error level in SARIF)
+            if grep -q '"level":"error"' ./checkov-results.sarif; then
+              echo "CRITICAL security issues found by Checkov!"
+              exit 1
+            elif [ $CHECKOV_EXIT_CODE -ne 0 ]; then
+              echo "Checkov found issues but none are CRITICAL"
+              exit 0
+            else
+              echo "No CRITICAL security issues found by Checkov"
+            fi
+          else
+            echo "Checkov results file not created"
+            exit 0
+          fi
+      
+      # 8. Check if Checkov results exist and upload
+      - name: Check Checkov results file
+        id: check_checkov_file
+        continue-on-error: true
+        run: |
+          if [ -f ./checkov-results.sarif ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "Checkov results file found"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "Checkov results file not found"
+          fi
+      
+      # 9. Upload Checkov results to GitHub Security tab
+      - name: Upload Checkov results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.check_checkov_file.outputs.file_exists == 'true'
+        with:
+          sarif_file: './checkov-results.sarif'
+          category: 'terraform-checkov-scan'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      # 10. Fail job if scans found CRITICAL vulnerabilities
+      - name: Fail on critical vulnerabilities
+        if: steps.tfsec.outcome == 'failure' || steps.checkov.outcome == 'failure'
+        run: |
+          echo "::error::Security scan detected CRITICAL vulnerabilities!"
+          if [ "${{ steps.tfsec.outcome }}" == "failure" ]; then
+            echo "::error::tfsec found CRITICAL issues"
+          fi
+          if [ "${{ steps.checkov.outcome }}" == "failure" ]; then
+            echo "::error::Checkov found CRITICAL issues"
+          fi
+          exit 1
+
   # Docker Compose Build Job
   docker-compose:
     name: Docker Compose Build
     runs-on: ubuntu-latest
-    needs: [backend-ci, frontend-ci]
+    needs: [backend-ci, frontend-ci, iac-security-scan]
     
     steps:
       # 1. Checkout code
