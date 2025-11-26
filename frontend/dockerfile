@@ -1,22 +1,42 @@
-# Dockerfile for the frontend application using Node.js and React
+# Multi-stage build for production
 
-# Use official Node.js image as base image
-FROM node:24.4-alpine
+# Build stage
+FROM node:24-slim AS builder
 
-# Set working directory for frontend
 WORKDIR /app
 
-# Copy frontend package files
+# Copy package files
 COPY package*.json ./
 
-# Install frontend dependencies
-RUN npm install
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci
 
-# Copy frontend source code
+# Copy source code
 COPY . .
 
-# Start development server
-CMD ["npm", "run", "dev", "--", "--host"]
+# Set build-time environment variable
+ARG VITE_API_URL=/api
+ENV VITE_API_URL=${VITE_API_URL}
 
-# Expose frontend port
+# Build the production bundle
+RUN npm run build
+
+# Production stage
+FROM node:24-slim
+
+WORKDIR /app
+
+# Copy package files for preview server
+COPY --from=builder /app/package*.json ./
+
+# Install only vite for preview server
+RUN npm install vite
+
+# Copy built files from builder stage
+COPY --from=builder /app/dist ./dist
+
+# Expose port
 EXPOSE 5173
+
+# Serve the built app using Vite preview
+CMD ["npx", "vite", "preview", "--host", "0.0.0.0", "--port", "5173"]

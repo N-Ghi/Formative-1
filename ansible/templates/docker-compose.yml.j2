@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    image: {{ registry_url }}/{{ image_name }}-backend:{{ image_tag }}
+    container_name: inventory-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.backend
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend:
+    image: {{ registry_url }}/{{ image_name }}-frontend:{{ image_tag }}
+    container_name: inventory-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  app-network:
+    driver: bridge

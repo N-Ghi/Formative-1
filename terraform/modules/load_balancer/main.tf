@@ -73,3 +73,23 @@ resource "azurerm_lb_rule" "https_rule" {
   enable_tcp_reset               = true
   idle_timeout_in_minutes        = 4
 }
+
+# Health Probe for Backend API (port 3000)
+resource "azurerm_lb_probe" "backend_probe" {
+  loadbalancer_id     = azurerm_lb.web_lb.id
+  name                = "backend-health-probe"
+  protocol            = "Tcp"
+  port                = 3000
+  interval_in_seconds = 15
+  number_of_probes    = 2
+}
+
+# Health Probe for Frontend (port 5173)
+resource "azurerm_lb_probe" "frontend_probe" {
+  loadbalancer_id     = azurerm_lb.web_lb.id
+  name                = "frontend-health-probe"
+  protocol            = "Tcp"
+  port                = 5173
+  interval_in_seconds = 15
+  number_of_probes    = 2
+}

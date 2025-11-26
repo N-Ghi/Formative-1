@@ -67,7 +67,7 @@ resource "azurerm_network_security_group" "private_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "80"
-    source_address_prefix      = "AzureLoadBalancer"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
@@ -80,7 +80,7 @@ resource "azurerm_network_security_group" "private_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "443"
-    source_address_prefix      = "AzureLoadBalancer"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
@@ -94,6 +94,32 @@ resource "azurerm_network_security_group" "private_nsg" {
     source_port_range          = "*"
     destination_port_range     = "80"
     source_address_prefix      = var.public_subnet_cidr
+    destination_address_prefix = "*"
+  }
+
+  # Allow backend app ports from Load Balancer
+  security_rule {
+    name                       = "Allow-Backend-from-LoadBalancer"
+    priority                   = 140
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    source_address_prefix      = "*"
+    destination_port_range     = "3000"
+    destination_address_prefix = "*"
+  }
+
+  # Allow frontend app port from Load Balancer
+  security_rule {
+    name                       = "Allow-Frontend-from-LoadBalancer"
+    priority                   = 150
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    source_address_prefix      = "*"
+    destination_port_range     = "5173"
     destination_address_prefix = "*"
   }
 }

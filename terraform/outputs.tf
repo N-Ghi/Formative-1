@@ -34,4 +34,3 @@ output "app_url" {
   description = "URL to access your web application"
   value       = "http://${module.load_balancer.load_balancer_public_ip}"
 }
-

@@ -21,3 +21,4 @@ variable "db_admin_password" {
   description = "Admin password for the database"
   sensitive   = true
 }
+
