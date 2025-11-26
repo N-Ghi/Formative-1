@@ -171,6 +171,7 @@ certs/*.crt
 
 # Shell files
 *.sh
+!docker-entrypoint.sh
 
 # Credentials
 .credentials
