@@ -1,5 +1,3 @@
-# modules/load_balancer/main.tf
-
 # Public IP for Load Balancer
 resource "azurerm_public_ip" "lb_public_ip" {
   name                = "${var.lb_name}-pip"
