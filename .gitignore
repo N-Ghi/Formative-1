@@ -163,8 +163,15 @@ vite.config.ts.timestamp-*
 .terraform.lock.hcl
 
 # Ansible files
-*inventory
+*inventory.*
 !*inventory.example
 
 # Certs
 certs/*.crt
+
+# Shell files
+*.sh
+!docker-entrypoint.sh
+
+# Credentials
+.credentials

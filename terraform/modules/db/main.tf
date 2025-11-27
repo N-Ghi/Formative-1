@@ -51,28 +51,11 @@ resource "azurerm_postgresql_flexible_server" "dev_db" {
   backup_retention_days        = 7
   zone                         = "2"
 
-  public_network_access_enabled = true
-}
+  public_network_access_enabled = false
+  delegated_subnet_id           = azurerm_subnet.db_subnet.id
+  private_dns_zone_id           = azurerm_private_dns_zone.postgres.id
 
-
-resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
-  name             = "allow-azure-services"
-  server_id        = azurerm_postgresql_flexible_server.dev_db.id
-  start_ip_address = "0.0.0.0"
-  end_ip_address   = "0.0.0.0"
-}
-
-# Allow your the team member's IP address
-resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_Ghislaine" {
-  name             = "allow-Ghislaine"
-  server_id        = azurerm_postgresql_flexible_server.dev_db.id
-  start_ip_address = var.my_ip
-  end_ip_address   = var.my_ip
-}
-
-resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_Palvis" {
-  name             = "allow-Palvis"
-  server_id        = azurerm_postgresql_flexible_server.dev_db.id
-  start_ip_address = var.palvis
-  end_ip_address   = var.palvis
+  depends_on = [
+    azurerm_private_dns_zone_virtual_network_link.postgres
+  ]
 }
