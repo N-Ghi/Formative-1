@@ -44,7 +44,7 @@ const LoginForm = ({ onToggle }) => {
             fontSize: '2.5rem', 
             fontWeight: '700', 
             margin: '0 0 0.5rem 0',
-            color: '#2563eb'
+            color: '#eb25deff'
           }}>
             Welcome Back
           </h2>
