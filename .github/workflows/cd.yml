@@ -104,6 +104,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./backend
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: |
             ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}-backend:latest
@@ -115,6 +116,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           build-args: |
             VITE_API_URL=/api
