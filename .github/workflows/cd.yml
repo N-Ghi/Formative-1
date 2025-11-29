@@ -106,7 +106,6 @@ jobs:
         with:
           context: ./backend
           push: true
-          builder: ${{ steps.buildx.outputs.name }}
           tags: |
             ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}-backend:latest
             ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}-backend:${{ github.sha }}
@@ -118,7 +117,6 @@ jobs:
         with:
           context: ./frontend
           push: true
-          builder: ${{ steps.buildx.outputs.name }}
           build-args: |
             VITE_API_URL=/api
           tags: |
