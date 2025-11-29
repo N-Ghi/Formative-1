@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { inventoryAPI, productAPI } from '../services/api';
 
 const Inventory = () => {
@@ -21,12 +21,7 @@ const Inventory = () => {
     restockValue: '',
   });
 
-  useEffect(() => {
-    loadInventory();
-    loadProducts();
-  }, []);
-
-  const loadInventory = async () => {
+  const loadInventory = useCallback(async () => {
     setLoading(true);
     try {
       const params = {};
@@ -34,7 +29,7 @@ const Inventory = () => {
       if (filters.quantityMax) params.quantityMax = filters.quantityMax;
       if (filters.restockMin) params.restockMin = filters.restockMin;
       if (filters.restockMax) params.restockMax = filters.restockMax;
-      
+
       const response = await inventoryAPI.getAll(params);
       setInventory(response.data.inventories || response.data);
       setError('');
@@ -44,15 +39,19 @@ const Inventory = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters.quantityMin, filters.quantityMax, filters.restockMin, filters.restockMax]);
+
+  useEffect(() => {
+    loadInventory();
+    loadProducts();
+  }, [loadInventory]);
 
   const loadProducts = async () => {
     try {
       console.log('Loading products for inventory...');
       const response = await productAPI.getMine();
       console.log('Products response in inventory:', response);
-      
-      // Ensure we have an array
+
       const productsData = response.data;
       if (Array.isArray(productsData)) {
         setProducts(productsData);
@@ -64,13 +63,13 @@ const Inventory = () => {
       }
     } catch (err) {
       console.error('Error loading products:', err);
-      setProducts([]); // Set empty array on error
+      setProducts([]);
     }
   };
 
   useEffect(() => {
     loadInventory();
-  }, [filters.quantityMin, filters.quantityMax, filters.restockMin, filters.restockMax]);
+  }, [loadInventory]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,7 +80,7 @@ const Inventory = () => {
         quantity: parseInt(formData.quantity),
         restockValue: parseInt(formData.restockValue),
       };
-      
+
       if (editingItem) {
         await inventoryAPI.update(editingItem.id, data);
       } else {
@@ -140,27 +139,15 @@ const Inventory = () => {
     const matchesSearch = !filters.search || 
       product.name?.toLowerCase().includes(filters.search.toLowerCase()) ||
       product.category?.toLowerCase().includes(filters.search.toLowerCase());
-    
+
     return matchesSearch;
   });
 
-  const getProductName = (item) => {
-    return item.productDetails?.name || item.Product?.name || 'Unknown Product';
-  };
+  const getProductName = (item) => item.productDetails?.name || item.Product?.name || 'Unknown Product';
+  const getProductCategory = (item) => item.productDetails?.category || item.Product?.category || 'Unknown';
+  const getProductPrice = (item) => item.productDetails?.price || item.Product?.price || 0;
+  const isLowStock = (item) => item.quantity <= item.restockValue;
 
-  const getProductCategory = (item) => {
-    return item.productDetails?.category || item.Product?.category || 'Unknown';
-  };
-
-  const getProductPrice = (item) => {
-    return item.productDetails?.price || item.Product?.price || 0;
-  };
-
-  const isLowStock = (item) => {
-    return item.quantity <= item.restockValue;
-  };
-
-  // Add error boundary-like protection
   if (error && error.includes('Failed to load')) {
     return (
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>

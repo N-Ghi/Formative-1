@@ -58,7 +58,7 @@ resource "azurerm_network_security_group" "private_nsg" {
     destination_address_prefix = "*"
   }
 
-  # Allow HTTP from Azure Load Balancer
+  # Allow HTTP from Azure Load Balancer (for health probes)
   security_rule {
     name                       = "Allow-HTTP-from-LoadBalancer"
     priority                   = 110
@@ -67,11 +67,11 @@ resource "azurerm_network_security_group" "private_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "80"
-    source_address_prefix      = "VirtualNetwork"
+    source_address_prefix      = "AzureLoadBalancer"
     destination_address_prefix = "*"
   }
 
-  # Allow HTTPS from Azure Load Balancer
+  # Allow HTTPS from Azure Load Balancer (for health probes)
   security_rule {
     name                       = "Allow-HTTPS-from-LoadBalancer"
     priority                   = 120
@@ -80,7 +80,7 @@ resource "azurerm_network_security_group" "private_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "443"
-    source_address_prefix      = "VirtualNetwork"
+    source_address_prefix      = "AzureLoadBalancer"
     destination_address_prefix = "*"
   }
 
@@ -94,6 +94,32 @@ resource "azurerm_network_security_group" "private_nsg" {
     source_port_range          = "*"
     destination_port_range     = "80"
     source_address_prefix      = var.public_subnet_cidr
+    destination_address_prefix = "*"
+  }
+
+  # Allow HTTP from Internet (for actual user traffic via load balancer)
+  security_rule {
+    name                       = "Allow-HTTP-from-Internet"
+    priority                   = 140
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "Internet"
+    destination_address_prefix = "*"
+  }
+
+  # Allow HTTPS from Internet (for actual user traffic via load balancer)
+  security_rule {
+    name                       = "Allow-HTTPS-from-Internet"
+    priority                   = 150
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "Internet"
     destination_address_prefix = "*"
   }
 }
