@@ -54,11 +54,11 @@ jobs:
         working-directory: ./backend
         env:
           NODE_ENV: test
-          AZURE_DB_USER: ${{ secrets.AZURE_DB_USER }}
-          AZURE_DB_PASSWORD: ${{ secrets.AZURE_DB_PASSWORD }}
-          AZURE_DB_NAME: ${{ secrets.AZURE_DB_NAME }}
-          AZURE_DB_HOST: ${{ secrets.AZURE_DB_HOST }}
-          AZURE_DB_PORT: ${{ secrets.AZURE_DB_PORT }}
+          AZURE_DB_USER: postgres
+          AZURE_DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          AZURE_DB_NAME: testdb
+          AZURE_DB_HOST: localhost
+          AZURE_DB_PORT: 5432
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
         run: npm test
