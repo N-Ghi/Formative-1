@@ -104,7 +104,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./backend
-          builder: prod-builder
           push: true
           tags: |
             ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}-backend:latest
@@ -116,7 +115,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
-          builder: prod-builder
           push: true
           build-args: |
             VITE_API_URL=/api
