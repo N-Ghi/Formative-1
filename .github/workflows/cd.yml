@@ -15,6 +15,24 @@ jobs:
     name: Run CI Checks
     runs-on: ubuntu-latest
     
+    # Add PostgreSQL service for tests
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          AZURE_DB_USER: ${{ secrets.AZURE_DB_USER }}
+          AZURE_DB_PASSWORD: ${{ secrets.AZURE_DB_PASSWORD }}
+          AZURE_DB_NAME: ${{ secrets.AZURE_DB_NAME }}
+          AZURE_DB_HOST: ${{ secrets.AZURE_DB_HOST }}
+          AZURE_DB_PORT: ${{ secrets.AZURE_DB_PORT }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,12 +49,19 @@ jobs:
       - name: Run backend linter
         working-directory: ./backend
         run: npm run lint
-        continue-on-error: true
       
       - name: Run backend tests
         working-directory: ./backend
+        env:
+          NODE_ENV: test
+          AZURE_DB_USER: ${{ secrets.AZURE_DB_USER }}
+          AZURE_DB_PASSWORD: ${{ secrets.AZURE_DB_PASSWORD }}
+          AZURE_DB_NAME: ${{ secrets.AZURE_DB_NAME }}
+          AZURE_DB_HOST: ${{ secrets.AZURE_DB_HOST }}
+          AZURE_DB_PORT: ${{ secrets.AZURE_DB_PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
         run: npm test
-        continue-on-error: true
       
       - name: Install frontend dependencies
         working-directory: ./frontend
@@ -45,12 +70,12 @@ jobs:
       - name: Run frontend linter
         working-directory: ./frontend
         run: npm run lint
-        continue-on-error: true
       
       - name: Run frontend tests
         working-directory: ./frontend
+        env:
+          VITE_API_URL: /api
         run: npm test
-        continue-on-error: true
 
   # Step 2: Build and push Docker images
   build-and-push:
