@@ -1,6 +1,177 @@
-# Inventory Management System
+# Inventory Management System - Operations Manual
 
 > A comprehensive full-stack web application for efficient inventory tracking, stock management, and automated low-stock alerts
+
+## Table of Contents
+
+- [Live Application](#live-application)
+- [Architecture Overview](#architecture-overview)
+- [Quick Start](#quick-start)
+- [Setup Instructions](#setup-instructions)
+- [Operations Guide](#operations-guide)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [API Documentation](#api-documentation)
+- [Development](#development)
+- [Troubleshooting](#troubleshooting)
+- [Future Enhancements](#future-enhancements)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Live Application
+
+### 🌐 Production URL
+
+**Live Application**: 🔗 [http://68.221.199.85/]
+**Video Link**: https://drive.google.com/drive/folders/147xbcdABoEtIJ7aYhnu73b9Nm-GByxeh?usp=sharing
+
+
+
+#### Finding Deployment URL
+
+**If deployed via Terraform/Azure:**
+```bash
+cd terraform
+terraform output app_url
+# Example output: http://20.123.45.67
+```
+
+**If deployed manually:**
+- Check your hosting provider's dashboard
+- Use the domain/IP assigned to your application
+
+**Local Development:**
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3000/api
+
+### Application Access Points
+
+Once you have the base URL, access the following:
+
+| Service | URL Pattern | Description |
+|---------|------------|-------------|
+| **Frontend** | `{BASE_URL}` | Main web application interface |
+| **Backend API** | `{BASE_URL}/api` | RESTful API endpoints |
+| **API Docs** | `{BASE_URL}/api/docs` | Interactive Swagger documentation |
+| **Health Check** | `{BASE_URL}/health` | Service health status |
+
+### Demo Credentials
+
+*(Add demo/test credentials here once available)*
+
+**Example format:**
+- **Email**: `demo@example.com`
+- **Password**: `demo123`
+
+---
+
+## Architecture Overview
+
+### System Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        Browser[Web Browser]
+        Mobile[Mobile Browser]
+    end
+
+    subgraph "Frontend Layer"
+        React[React Application<br/>Port: 5173]
+        Static[Static Assets]
+    end
+
+    subgraph "API Gateway / Load Balancer"
+        LB[Load Balancer<br/>Nginx/Azure LB]
+    end
+
+    subgraph "Backend Layer"
+        Express[Express.js API Server<br/>Port: 3000]
+        Auth[JWT Authentication]
+        Middleware[Request Middleware]
+    end
+
+    subgraph "Data Layer"
+        DB[(SQLite Database<br/>Sequelize ORM)]
+        Models[Data Models<br/>Users, Products, Inventory]
+    end
+
+    subgraph "External Services"
+        Swagger[Swagger/OpenAPI Docs]
+    end
+
+    Browser --> LB
+    Mobile --> LB
+    LB --> React
+    React -->|HTTP Requests| Express
+    Express --> Auth
+    Auth --> Middleware
+    Middleware --> Express
+    Express --> Models
+    Models --> DB
+    Express --> Swagger
+
+    style React fill:#61dafb
+    style Express fill:#339933
+    style DB fill:#003366,color:#fff
+    style LB fill:#ff6b6b
+```
+
+### Architecture Components
+
+#### **Frontend (React + Vite)**
+- **Technology**: React 18+, Vite build tool
+- **Port**: 5173 (development), configured via reverse proxy (production)
+- **Key Features**:
+  - Single Page Application (SPA)
+  - Client-side routing with React Router
+  - State management via React Context API
+  - Responsive design for mobile, tablet, and desktop
+
+#### **Backend (Node.js + Express)**
+- **Technology**: Node.js, Express.js (ES modules)
+- **Port**: 3000
+- **Key Features**:
+  - RESTful API architecture
+  - JWT-based authentication
+  - Sequelize ORM for database operations
+  - Swagger API documentation
+  - CORS enabled for cross-origin requests
+
+#### **Database (SQLite)**
+- **Technology**: SQLite with Sequelize ORM
+- **Storage**: File-based database (`database.sqlite`)
+- **Migrations**: Sequelize migrations for schema management
+- **Seeders**: Sample data for development/testing
+
+#### **Infrastructure (Optional - Production)**
+- **Containerization**: Docker & Docker Compose
+- **Cloud Deployment**: Azure (via Terraform)
+- **Load Balancer**: Azure Load Balancer / Nginx
+- **Automation**: Ansible for deployment automation
+- **CI/CD**: GitHub Actions for automated testing
+
+### Data Flow
+
+1. **User Request**: Browser sends HTTP request to load balancer
+2. **Routing**: Load balancer routes request to appropriate service (frontend or backend)
+3. **Authentication**: Backend validates JWT token for protected routes
+4. **Business Logic**: Controllers process requests and interact with models
+5. **Data Access**: Sequelize ORM queries SQLite database
+6. **Response**: JSON response sent back to frontend
+7. **UI Update**: React updates UI based on response
+
+### Security Architecture
+
+- **Authentication**: JWT tokens stored in localStorage
+- **Authorization**: Middleware checks token validity on protected routes
+- **CORS**: Configured to allow requests only from authorized frontend URL
+- **Password Security**: bcrypt hashing for password storage
+- **Environment Variables**: Sensitive configuration stored in `.env` files
+
+---
 
 ## African Context
 
@@ -83,17 +254,23 @@ With an intuitive user interface, robust backend architecture using Sequelize OR
 - **Styling**: Custom CSS for responsive design
 - **Development Tools**: Nodemon for hot reloading
 
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 
-- Node.js 16+ and npm
-- Git
-- Docker and Docker Compose (optional, for containerized deployment)
+Before starting, ensure you have the following installed:
+
+| Requirement | Version | Purpose |
+|------------|---------|---------|
+| **Node.js** | 16+ | Runtime environment |
+| **npm** | 8+ | Package manager |
+| **Git** | Latest | Version control |
+| **Docker** (optional) | 20.10+ | Containerization |
+| **Docker Compose** (optional) | 2.0+ | Multi-container orchestration |
 
 ### Quick Start with Docker 🐳 (Recommended)
 
-The easiest way to get the application running is with Docker Compose:
+The fastest way to get the application running:
 
 ```bash
 # 1. Clone the repository
@@ -101,10 +278,11 @@ git clone https://github.com/N-Ghi/Formative-1.git
 cd Formative-1
 
 # 2. Start all services
-docker-compose up
+docker-compose up --build
 
-# Or start in background
-docker-compose up -d
+# 3. Run database migrations (in a new terminal)
+docker-compose exec backend npx sequelize-cli db:migrate
+docker-compose exec backend npx sequelize-cli db:seed:all
 ```
 
 **Access the application:**
@@ -112,25 +290,26 @@ docker-compose up -d
 - Backend API: http://localhost:3000/api
 - API Docs: http://localhost:3000/api/docs
 
-See the "Running with Docker Compose" section below for complete instructions.
-
 ---
 
-## Running with Docker Compose
+## Setup Instructions
 
-### Prerequisites for Docker Setup
+This section provides comprehensive setup instructions for running the Inventory Management System in different environments.
 
-Before you begin, ensure you have the following installed:
-- **Docker** (version 20.10 or higher) - [Download Docker](https://docs.docker.com/get-docker/)
-- **Docker Compose** (version 2.0 or higher) - Included with Docker Desktop
+### Method 1: Docker Compose Setup (Recommended for Development)
 
-Verify your installation:
-```bash
-docker --version
-docker-compose --version
-```
+Docker Compose provides the easiest way to run the entire application stack with minimal configuration.
 
-### Step-by-Step Setup with Docker Compose
+#### Prerequisites
+
+- **Docker Desktop** (includes Docker Compose) - [Download Docker](https://docs.docker.com/get-docker/)
+- Verify installation:
+  ```bash
+  docker --version          # Should show Docker 20.10 or higher
+  docker-compose --version  # Should show Docker Compose 2.0 or higher
+  ```
+
+#### Step-by-Step Docker Setup
 
 #### 1. Clone the Repository
 ```bash
@@ -468,62 +647,332 @@ You can modify `docker-compose.yml` to:
 
 ---
 
-### Manual Installation
+### Method 2: Manual Setup (Without Docker)
 
-1. **Clone the repository**
+Manual setup is useful for development when you need more control over the environment or want to debug more easily.
+
+#### Step 1: Clone the Repository
+
 ```bash
 git clone https://github.com/N-Ghi/Formative-1.git
 cd Formative-1
 ```
 
-2. **Backend Setup**
+#### Step 2: Backend Setup
 
 ```bash
 cd backend
 npm install
 ```
 
+#### Step 3: Configure Backend Environment
 
-3. **Prepare the database**
+Create a `.env` file in the `backend/` directory:
 
 ```bash
-# Run migrations (using sequelize-cli)
+cd backend
+cp .env.example .env  # If .env.example exists
+# Or create manually:
+```
+
+Edit `.env` with your configuration:
+
+```env
+PORT=3000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+JWT_SECRET=your-secure-secret-key-here
+JWT_EXPIRES_IN=7d
+DB_STORAGE=./database.sqlite
+```
+
+**Important**: Replace `JWT_SECRET` with a secure random string!
+
+#### Step 4: Initialize Database
+
+```bash
+# Run migrations to create database tables
 npx sequelize-cli db:migrate
 
-# Seed initial data (users and sample products)
+# Seed database with sample data (users and products)
 npx sequelize-cli db:seed:all
 ```
 
-4. **Start Backend Server**
+#### Step 5: Start Backend Server
 
 ```bash
-# Development mode with nodemon
-npx nodemon app.js
+# Development mode with hot-reload (nodemon)
+npm start
 
 # Or production mode
 node app.js
 ```
 
-5. **Frontend Setup**
+The backend will start on `http://localhost:3000`
 
-Open a new terminal window:
+#### Step 6: Frontend Setup
+
+Open a **new terminal window**:
 
 ```bash
 cd frontend
 npm install
 ```
 
+#### Step 7: Configure Frontend Environment
 
-6. **Start Frontend Development Server**
+Create a `.env` file in the `frontend/` directory:
+
+```env
+VITE_API_URL=http://localhost:3000/api
+```
+
+#### Step 8: Start Frontend Development Server
 
 ```bash
 npm run dev
 ```
 
-Frontend will run on `http://localhost:5173`
+The frontend will start on `http://localhost:5173`
+
+#### Step 9: Access the Application
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3000/api
+- **API Documentation**: http://localhost:3000/api/docs
 
 
-### Usage
+### Operations Guide
+
+This section provides operational commands and procedures for managing the application in different environments.
+
+### Development Operations
+
+#### Starting Services
+
+**With Docker Compose:**
+```bash
+# Start all services in foreground (see logs)
+docker-compose up
+
+# Start all services in background
+docker-compose up -d
+
+# Start and rebuild containers
+docker-compose up --build
+```
+
+**Manual Start:**
+```bash
+# Terminal 1 - Backend
+cd backend && npm start
+
+# Terminal 2 - Frontend
+cd frontend && npm run dev
+```
+
+#### Stopping Services
+
+**With Docker Compose:**
+```bash
+# Stop services (keep volumes)
+docker-compose down
+
+# Stop services and remove volumes (⚠️ deletes database)
+docker-compose down -v
+```
+
+**Manual Stop:**
+- Press `Ctrl+C` in each terminal window
+
+#### Viewing Logs
+
+**Docker Compose:**
+```bash
+# View all logs
+docker-compose logs
+
+# Follow logs in real-time
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+```
+
+**Manual:**
+- Logs appear directly in the terminal windows
+
+#### Database Operations
+
+**With Docker Compose:**
+```bash
+# Run migrations
+docker-compose exec backend npx sequelize-cli db:migrate
+
+# Undo last migration
+docker-compose exec backend npx sequelize-cli db:migrate:undo
+
+# Reset database (undo all migrations)
+docker-compose exec backend npx sequelize-cli db:migrate:undo:all
+
+# Seed database
+docker-compose exec backend npx sequelize-cli db:seed:all
+
+# Undo all seeds
+docker-compose exec backend npx sequelize-cli db:seed:undo:all
+```
+
+**Manual:**
+```bash
+cd backend
+
+# Run migrations
+npx sequelize-cli db:migrate
+
+# Seed database
+npx sequelize-cli db:seed:all
+```
+
+#### Database Backup and Restore
+
+**Backup:**
+```bash
+# With Docker
+docker-compose exec backend cp database.sqlite database.sqlite.backup
+
+# Manual
+cp backend/database.sqlite backend/database.sqlite.backup
+```
+
+**Restore:**
+```bash
+# With Docker
+docker-compose exec backend cp database.sqlite.backup database.sqlite
+
+# Manual
+cp backend/database.sqlite.backup backend/database.sqlite
+```
+
+#### Running Tests
+
+**With Docker Compose:**
+```bash
+# Backend tests
+docker-compose exec backend npm test
+
+# Frontend tests
+docker-compose exec frontend npm test
+```
+
+**Manual:**
+```bash
+# Backend tests
+cd backend && npm test
+
+# Frontend tests
+cd frontend && npm test
+```
+
+#### Installing Dependencies
+
+**With Docker Compose:**
+```bash
+# Backend
+docker-compose exec backend npm install <package-name>
+docker-compose restart backend
+
+# Frontend
+docker-compose exec frontend npm install <package-name>
+docker-compose restart frontend
+```
+
+**Manual:**
+```bash
+# Backend
+cd backend && npm install <package-name>
+
+# Frontend
+cd frontend && npm install <package-name>
+```
+
+### Production Operations
+
+For production deployments using Terraform/Azure infrastructure:
+
+#### Deployment Commands
+
+```bash
+# Initialize Terraform
+cd terraform
+terraform init
+
+# Plan deployment
+terraform plan
+
+# Apply infrastructure
+terraform apply
+
+# Get application URL
+terraform output app_url
+
+# Get load balancer IP
+terraform output load_balancer_public_ip
+```
+
+#### Deployment with Ansible
+
+```bash
+# Provision infrastructure
+ansible-playbook -i inventory ansible/provision.yml
+
+# Deploy application
+ansible-playbook -i inventory ansible/deploy.yml
+```
+
+### Health Checks
+
+#### Check Service Status
+
+**Docker Compose:**
+```bash
+# Check container status
+docker-compose ps
+
+# Check container health
+docker ps --format "table {{.Names}}\t{{.Status}}"
+```
+
+**Manual - Backend Health:**
+```bash
+curl http://localhost:3000/health
+# Should return: OK
+```
+
+**Manual - API Docs:**
+```bash
+curl http://localhost:3000/api/docs
+# Should return HTML
+```
+
+**Frontend:**
+- Open browser: http://localhost:5173
+- Should see login page
+
+### Performance Monitoring
+
+```bash
+# Check resource usage (Docker)
+docker stats
+
+# Check backend process (Manual)
+# Use system monitoring tools or:
+ps aux | grep node
+```
+
+---
+
+## Usage
 
 #### Getting Started
 
