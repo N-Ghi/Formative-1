@@ -181,7 +181,9 @@ jobs:
         run: |
           echo "Testing connection to app VM through bastion..."
           ssh -o ConnectTimeout=10 \
-            -o ProxyCommand="ssh -W %h:%p -o StrictHostKeyChecking=no ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}" \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o ProxyCommand="ssh -W %h:%p -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}" \
             ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} \
             "echo 'App VM connection successful'"
       
