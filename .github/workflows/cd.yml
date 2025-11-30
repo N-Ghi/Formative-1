@@ -143,9 +143,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H $VM_HOST >> ~/.ssh/known_hosts 2>&1 || echo "Warning: ssh-keyscan failed, continuing anyway"
+          cat ~/.ssh/id_rsa | head -n 1  # Verify key format
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          VM_HOST: ${{ secrets.VM_HOST }}
       - name: Create Ansible inventory
         run: |
           cat > inventory.ini <<EOF
