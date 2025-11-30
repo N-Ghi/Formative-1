@@ -109,7 +109,7 @@ const LoginForm = ({ onToggle }) => {
             className="hover-lift"
             style={{ 
               width: '100%', 
-              background: '#2563eb',
+              background: '#074a1dff',
               color: 'white',
               border: 'none',
               padding: '1rem',
