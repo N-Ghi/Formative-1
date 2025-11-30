@@ -198,6 +198,11 @@
         append: yes
         create_home: yes
         shell: /bin/bash
+    - name: Add VM user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
 
     - name: Create app directory
       file:
