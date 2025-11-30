@@ -26,9 +26,9 @@ This project includes an automated Continuous Integration (CI) pipeline that ens
 - ✅ Docker build verification
 
 ### 📊 **Pipeline Jobs**
-1. **Backend CI**: Linting, testing, and Docker build
-2. **Frontend CI**: Linting, testing, and Docker build  
-3. **Docker Compose**: Full stack integration test
+1. **Backend CI**: Linting, testing, and Docker build.
+2. **Frontend CI**: Linting, testing, and Docker build.  
+3. **Docker Compose**: Full stack integration test.
 
 ### 🚫 **Quality Gates**
 The pipeline **fails** if:
